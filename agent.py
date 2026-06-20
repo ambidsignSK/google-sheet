@@ -9,9 +9,11 @@ import time
 import smtplib
 import logging
 import json
+import base64
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 from urllib.parse import urlparse, urljoin
 
 import requests
@@ -593,24 +595,73 @@ ambidesign.eu
 """
 
 
+LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+
+
+def build_html_body(plain_body: str) -> str:
+    """Konvertuje plain text na HTML s logom v podpise."""
+    # Rozdelime telo a podpis (podpis zacina od "S pozdravom")
+    if "S pozdravom" in plain_body:
+        split_at = plain_body.index("S pozdravom")
+        content = plain_body[:split_at]
+        signature = plain_body[split_at:]
+    elif "S pozdravem" in plain_body:
+        split_at = plain_body.index("S pozdravem")
+        content = plain_body[:split_at]
+        signature = plain_body[split_at:]
+    else:
+        content = plain_body
+        signature = ""
+
+    def to_html(text: str) -> str:
+        lines = text.split("\n")
+        html_lines = []
+        for line in lines:
+            if line.startswith("**") and line.endswith("**"):
+                line = f"<strong>{line[2:-2]}</strong>"
+            elif line.startswith("- "):
+                line = f"&bull; {line[2:]}"
+            html_lines.append(line if line.strip() else "<br>")
+        return "<br>".join(html_lines)
+
+    logo_tag = '<img src="cid:logo" alt="Ambi Design" style="max-width:180px;margin-top:12px;">' if os.path.exists(LOGO_PATH) else ""
+
+    html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
+<p>{to_html(content)}</p>
+<hr style="border:none;border-top:1px solid #ddd;margin:16px 0;">
+<p style="font-size:13px;color:#444;">{to_html(signature)}</p>
+{logo_tag}
+</body></html>"""
+    return html
+
+
 def send_email(to_email: str, subject: str, body: str) -> bool:
-    """Odosle email cez Gmail SMTP."""
+    """Odosle email cez Gmail SMTP s logom v podpise."""
     if not GMAIL_APP_PASSWORD:
         log.error("GMAIL_APP_PASSWORD nie je nastavene v .env")
         return False
 
     try:
-        msg = MIMEMultipart("alternative")
+        msg = MIMEMultipart("related")
         msg["Subject"] = subject
         msg["From"] = GMAIL_ADDRESS
         msg["To"] = to_email
 
-        # Plain text aj HTML verzia
+        alternative = MIMEMultipart("alternative")
+        msg.attach(alternative)
+
         text_part = MIMEText(body, "plain", "utf-8")
-        html_body = body.replace("\n", "<br>").replace("**", "<b>").replace("**", "</b>")
-        html_part = MIMEText(f"<html><body>{html_body}</body></html>", "html", "utf-8")
-        msg.attach(text_part)
-        msg.attach(html_part)
+        html_part = MIMEText(build_html_body(body), "html", "utf-8")
+        alternative.attach(text_part)
+        alternative.attach(html_part)
+
+        # Pripoj logo ako inline obrazok
+        if os.path.exists(LOGO_PATH):
+            with open(LOGO_PATH, "rb") as f:
+                img = MIMEImage(f.read(), _subtype="jpeg")
+            img.add_header("Content-ID", "<logo>")
+            img.add_header("Content-Disposition", "inline", filename="logo.jpg")
+            msg.attach(img)
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
