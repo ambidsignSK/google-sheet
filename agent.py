@@ -624,7 +624,7 @@ def build_html_body(plain_body: str) -> str:
             html_lines.append(line if line.strip() else "<br>")
         return "<br>".join(html_lines)
 
-    logo_tag = '<img src="cid:logo" alt="Ambi Design" style="max-width:180px;margin-top:12px;">' if os.path.exists(LOGO_PATH) else ""
+    logo_tag = '<img src="cid:logo" alt="Ambi Design" style="max-width:100px;max-height:100px;margin-top:12px;">' if os.path.exists(LOGO_PATH) else ""
 
     html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
 <p>{to_html(content)}</p>
