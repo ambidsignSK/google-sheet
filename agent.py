@@ -548,8 +548,8 @@ V dnešnej dobe je online viditeľnosť kľúčová pre rýchly rast. Ponúkame 
 - Prvý mesiac správy ZADARMO (pri podpise zmluvy na 3 mesiace)
 
 **Cenník správy:**
-- Starter (rozpočet do 300 €/mes): 149 €/mes
-- Business (rozpočet do 800 €/mes): 249 €/mes
+- Starter (rozpočet do 300 €/mes): 159 €/mes
+- Business (rozpočet do 800 €/mes): 259 €/mes
 - Pro (nad 800 €/mes): individuálna dohoda
 
 Radi Vám pripravíme bezplatnú analýzu a konkrétny návrh kampane na mieru.
@@ -575,8 +575,8 @@ V dnešní době je online viditelnost klíčová pro rychlý růst. Nabízíme 
 - První měsíc správy ZDARMA (při podpisu smlouvy na 3 měsíce)
 
 **Ceník správy:**
-- Starter (rozpočet do 300 €/měs): 149 €/měs
-- Business (rozpočet do 800 €/měs): 249 €/měs
+- Starter (rozpočet do 300 €/měs): 159 €/měs
+- Business (rozpočet do 800 €/měs): 259 €/měs
 - Pro (nad 800 €/měs): individuální dohoda
 
 Rádi Vám připravíme bezplatnou analýzu a konkrétní návrh kampaně na míru.
@@ -695,13 +695,21 @@ def run_agent():
             results["companies"].append({**company, "status": "already_sent"})
             continue
 
-        # 4. Odoslat cenovu ponuku
-        if company["country"] == "SK":
+        # 4. Odoslat cenovu ponuku - jazyk podla domeny emailu
+        if email.endswith(".sk"):
             subject = EMAIL_SUBJECT_SK
             body = EMAIL_BODY_SK
-        else:
+        elif email.endswith(".cz"):
             subject = EMAIL_SUBJECT_CZ
             body = EMAIL_BODY_CZ
+        else:
+            # Pre ostatne domeny (.com, .eu atd.) podla krajiny firmy
+            if company["country"] == "SK":
+                subject = EMAIL_SUBJECT_SK
+                body = EMAIL_BODY_SK
+            else:
+                subject = EMAIL_SUBJECT_CZ
+                body = EMAIL_BODY_CZ
 
         if GMAIL_APP_PASSWORD:
             success = send_email(email, subject, body)
