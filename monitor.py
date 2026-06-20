@@ -36,8 +36,8 @@ log = logging.getLogger(__name__)
 
 GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS", "ambidsign@gmail.com")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
-WHATSAPP_PHONE = os.getenv("WHATSAPP_PHONE", "")        # tvoje cislo s pred. kodom napr. 421907926375
-WHATSAPP_API_KEY = os.getenv("WHATSAPP_API_KEY", "")    # API kluc od CallMeBot
+WHATSAPP_PHONE = os.getenv("WHATSAPP_PHONE", "")    # tvoje cislo s pred. kodom napr. +421907926375
+WHATSAPP_GROUP = os.getenv("WHATSAPP_GROUP", "")    # nazov WhatsApp skupiny (volitelne)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 SEEN_LOG = "seen_replies.json"
@@ -248,29 +248,40 @@ def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# WhatsApp notifikacia cez CallMeBot
+# WhatsApp notifikacia cez WhatsApp Web (pywhatkit)
 # ---------------------------------------------------------------------------
 
 def send_whatsapp(message: str) -> bool:
-    """Posle WhatsApp spravu cez CallMeBot API."""
-    if not WHATSAPP_PHONE or not WHATSAPP_API_KEY:
-        log.warning("WHATSAPP_PHONE alebo WHATSAPP_API_KEY nie su nastavene v .env")
+    """Posle WhatsApp spravu cez WhatsApp Web v prehliadaci."""
+    if not WHATSAPP_PHONE and not WHATSAPP_GROUP:
+        log.warning("WHATSAPP_PHONE alebo WHATSAPP_GROUP nie su nastavene v .env")
         return False
 
     try:
-        url = "https://api.callmebot.com/whatsapp.php"
-        params = {
-            "phone": WHATSAPP_PHONE,
-            "text": message,
-            "apikey": WHATSAPP_API_KEY,
-        }
-        r = requests.get(url, params=params, timeout=10)
-        if r.status_code == 200:
-            log.info("WhatsApp notifikacia odoslana")
-            return True
+        import pywhatkit as pwk
+
+        if WHATSAPP_GROUP:
+            # Posli do skupiny podla nazvu
+            pwk.sendwhatmsg_to_group_instantly(
+                group_id=WHATSAPP_GROUP,
+                message=message,
+                wait_time=10,
+                tab_close=True,
+                close_time=3,
+            )
         else:
-            log.error(f"WhatsApp chyba: {r.status_code} - {r.text[:200]}")
-            return False
+            # Posli priamo na cislo
+            pwk.sendwhatmsg_instantly(
+                phone_no=WHATSAPP_PHONE,
+                message=message,
+                wait_time=10,
+                tab_close=True,
+                close_time=3,
+            )
+
+        log.info("WhatsApp notifikacia odoslana cez WhatsApp Web")
+        return True
+
     except Exception as e:
         log.error(f"WhatsApp chyba: {e}")
         return False
