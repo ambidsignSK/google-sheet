@@ -627,10 +627,12 @@ def build_html_body(plain_body: str) -> str:
                 line = f"&bull; {line}"
             else:
                 line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
+            # Klikatelny odkaz pre ambidesign.eu
+            line = _re.sub(r'(?<![">])(ambidesign\.eu)', r'<a href="https://ambidesign.eu" target="_blank">\1</a>', line)
             html_lines.append(line if line.strip() else "<br>")
         return "<br>".join(html_lines)
 
-    logo_tag = '<img src="cid:logo" alt="Ambi Design" style="max-width:100px;max-height:100px;margin-top:12px;">' if os.path.exists(LOGO_PATH) else ""
+    logo_tag = '<a href="https://ambidesign.eu" target="_blank"><img src="cid:logo" alt="Ambi Design" style="max-width:100px;max-height:100px;margin-top:8px;display:block;border:none;"></a>' if os.path.exists(LOGO_PATH) else ""
 
     html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.4;">
 <p style="margin:0 0 8px 0;">{to_html(content)}</p>
