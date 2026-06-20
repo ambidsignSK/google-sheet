@@ -110,7 +110,7 @@ def fetch_replies() -> list[dict]:
     """Prihlasi sa do Gmailu cez IMAP a najde odpovede na nase emaily."""
     replies = []
     try:
-        mail = imaplib.IMAP4_SSL("imap.gmail.com")
+        mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=15)
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         mail.select("inbox")
 
