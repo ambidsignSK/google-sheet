@@ -547,9 +547,9 @@ V dnešnej dobe je online viditeľnosť kľúčová pre rýchly rast. Ponúkame 
 - Mesačné reporty a optimalizácia kampaní
 
 **Cenník správy:**
-- Starter (rozpočet do 300 €/mes): 200 €/mes
-- Business (rozpočet do 800 €/mes): 350 €/mes
-- Pro (nad 800 €/mes): individuálna dohoda
+- **Štartér** (rozpočet do 300 €/mes): 200 €/mes
+- **Business** (rozpočet do 800 €/mes): 350 €/mes
+- **PRO** (nad 800 €/mes): individuálna dohoda
 
 Radi Vám pripravíme bezplatnú analýzu a konkrétny návrh kampane na mieru.
 
@@ -576,9 +576,9 @@ V dnešní době je online viditelnost klíčová pro rychlý růst. Nabízíme 
 - Měsíční reporty a optimalizace kampaní
 
 **Ceník správy:**
-- Starter (rozpočet do 300 €/měs): 200 €/měs
-- Business (rozpočet do 800 €/měs): 350 €/měs
-- Pro (nad 800 €/měs): individuální dohoda
+- **Štartér** (rozpočet do 300 €/měs): 200 €/měs
+- **Business** (rozpočet do 800 €/měs): 350 €/měs
+- **PRO** (nad 800 €/měs): individuální dohoda
 
 Rádi Vám připravíme bezplatnou analýzu a konkrétní návrh kampaně na míru.
 
@@ -614,13 +614,19 @@ def build_html_body(plain_body: str) -> str:
         signature = ""
 
     def to_html(text: str) -> str:
+        import re as _re
         lines = text.split("\n")
         html_lines = []
         for line in lines:
-            if line.startswith("**") and line.endswith("**"):
+            # Tučné nadpisy (celý riadok je **text**)
+            if line.startswith("**") and line.endswith("**") and line.count("**") == 2:
                 line = f"<strong>{line[2:-2]}</strong>"
             elif line.startswith("- "):
-                line = f"&bull; {line[2:]}"
+                # Tučné slová uprostred riadku (**Štartér** atd.)
+                line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line[2:])
+                line = f"&bull; {line}"
+            else:
+                line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
             html_lines.append(line if line.strip() else "<br>")
         return "<br>".join(html_lines)
 
