@@ -632,10 +632,9 @@ def build_html_body(plain_body: str) -> str:
 
     logo_tag = '<img src="cid:logo" alt="Ambi Design" style="max-width:100px;max-height:100px;margin-top:12px;">' if os.path.exists(LOGO_PATH) else ""
 
-    html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
-<p>{to_html(content)}</p>
-<hr style="border:none;border-top:1px solid #ddd;margin:16px 0;">
-<p style="font-size:13px;color:#444;">{to_html(signature)}</p>
+    html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.4;">
+<p style="margin:0 0 8px 0;">{to_html(content)}</p>
+<p style="font-size:15px;color:#111;margin:8px 0 4px 0;line-height:1.5;">{to_html(signature)}</p>
 {logo_tag}
 </body></html>"""
     return html
