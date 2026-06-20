@@ -740,7 +740,86 @@ def run_agent():
     log.info(f"  Report uložený do:   {report_file}")
     log.info("=" * 60)
 
+    # Notifikacie
+    if results["total_found"] > 0:
+        notify_desktop(
+            title=f"PPC Agent – {results['total_found']} nových firiem",
+            message=(
+                f"Emailov nájdených: {results['emails_found']}\n"
+                f"Odoslaných ponúk: {results['emails_sent']}"
+            ),
+        )
+        send_summary_notification(results)
+
     return results
+
+
+# ---------------------------------------------------------------------------
+# Notifikacie
+# ---------------------------------------------------------------------------
+
+def notify_desktop(title: str, message: str):
+    """Zobrazi Windows/Mac/Linux desktop notifikaciu."""
+    try:
+        from plyer import notification
+        notification.notify(
+            title=title,
+            message=message,
+            app_name="PPC Lead Agent",
+            timeout=10,
+        )
+    except Exception as e:
+        log.debug(f"Desktop notifikacia zlyhala: {e}")
+
+
+def send_summary_notification(results: dict):
+    """Odosle sumarny email na ambidsign@gmail.com s prehadom behu."""
+    if not GMAIL_APP_PASSWORD:
+        return
+
+    found = results["total_found"]
+    emails_found = results["emails_found"]
+    sent_count = results["emails_sent"]
+
+    if found == 0:
+        return  # Nic nenajdene, neposielat ziadnu notifikaciu
+
+    # Zoznam firiem s emailom - max 50 riadkov
+    rows = ""
+    for c in results["companies"]:
+        status_icon = {"sent": "✅", "dry_run": "📋", "no_email": "❌", "already_sent": "⏭", "error": "⚠️"}.get(c.get("status", ""), "•")
+        email_str = c.get("email", "-")
+        source = c.get("source", c.get("country", ""))
+        rows += f"{status_icon} {c['name']} | {c.get('city','')} | {email_str} | {source}\n"
+
+    body = f"""PPC Lead Agent - súhrn behu {datetime.now().strftime('%d.%m.%Y %H:%M')}
+
+📊 ŠTATISTIKY:
+  Firiem nájdených:   {found}
+  Emailov nájdených:  {emails_found}
+  Emailov odoslaných: {sent_count}
+  Preskočených:       {results['skipped']}
+
+📋 ZOZNAM FIRIEM:
+{rows}
+---
+Legenda: ✅ odoslané | ❌ email nenájdený | ⏭ už odoslané | ⚠️ chyba
+"""
+
+    try:
+        msg = MIMEMultipart()
+        msg["Subject"] = f"[PPC Agent] {found} nových firiem nájdených – {sent_count} emailov odoslaných"
+        msg["From"] = GMAIL_ADDRESS
+        msg["To"] = GMAIL_ADDRESS
+        msg.attach(MIMEText(body, "plain", "utf-8"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+            server.sendmail(GMAIL_ADDRESS, GMAIL_ADDRESS, msg.as_string())
+
+        log.info(f"Sumarny notifikacny email odoslany na {GMAIL_ADDRESS}")
+    except Exception as e:
+        log.error(f"Chyba pri odosielani sumarneho emailu: {e}")
 
 
 def send_to_email(email: str):
