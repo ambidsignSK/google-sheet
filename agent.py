@@ -743,5 +743,39 @@ def run_agent():
     return results
 
 
+def send_to_email(email: str):
+    """Odosle cenovu ponuku priamo na zadany email."""
+    email = email.strip().lower()
+    if not EMAIL_REGEX.match(email):
+        log.error(f"Neplatna emailova adresa: {email}")
+        return
+
+    if email.endswith(".sk"):
+        subject = EMAIL_SUBJECT_SK
+        body = EMAIL_BODY_SK
+    elif email.endswith(".cz"):
+        subject = EMAIL_SUBJECT_CZ
+        body = EMAIL_BODY_CZ
+    else:
+        subject = EMAIL_SUBJECT_SK
+        body = EMAIL_BODY_SK
+
+    log.info(f"Odosielam cenovu ponuku na: {email}")
+    if GMAIL_APP_PASSWORD:
+        success = send_email(email, subject, body)
+        if success:
+            sent = load_sent()
+            sent.add(email)
+            save_sent(sent)
+    else:
+        log.warning(f"[DRY RUN] Email by bol odoslany na: {email}")
+        log.warning("Nastav GMAIL_APP_PASSWORD v .env subore")
+
+
 if __name__ == "__main__":
-    run_agent()
+    import sys
+    if len(sys.argv) > 1:
+        # python agent.py email@firma.sk
+        send_to_email(sys.argv[1])
+    else:
+        run_agent()
