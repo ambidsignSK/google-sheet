@@ -555,9 +555,14 @@ Radi Vám pripravíme bezplatnú analýzu a konkrétny návrh kampane na mieru.
 
 Neváhajte nás kontaktovať – odpovieme do 24 hodín.
 
-S pozdravom,
-Tím ambidsign
-ambidsign@gmail.com
+S pozdravom
+
+Tomáš Ambroz
+@mbi design
++421 907 926 375
+
+Web a Kampaň, ktoré zarábajú.
+ambidesign.eu
 """
 
 EMAIL_BODY_CZ = """\
@@ -581,9 +586,14 @@ Rádi Vám připravíme bezplatnou analýzu a konkrétní návrh kampaně na mí
 
 Neváhejte nás kontaktovat – odpovíme do 24 hodin.
 
-S pozdravem,
-Tým ambidsign
-ambidsign@gmail.com
+S pozdravem
+
+Tomáš Ambroz
+@mbi design
++421 907 926 375
+
+Web a Kampaň, ktoré zarábajú.
+ambidesign.eu
 """
 
 
