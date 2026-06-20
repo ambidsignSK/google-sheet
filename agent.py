@@ -652,6 +652,20 @@ def build_html_body(plain_body: str) -> str:
     return html
 
 
+SENT_IDS_LOG = "sent_message_ids.json"
+
+
+def _save_sent_message_id(message_id: str, to_email: str):
+    """Ulozi Message-ID odoslaneho emailu pre neskorsi matching odpovedi."""
+    data = {}
+    if os.path.exists(SENT_IDS_LOG):
+        with open(SENT_IDS_LOG, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    data[message_id] = {"to": to_email, "sent_at": datetime.now().isoformat()}
+    with open(SENT_IDS_LOG, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
 def send_email(to_email: str, subject: str, body: str) -> bool:
     """Odosle email cez Gmail SMTP s logom v podpise."""
     if not GMAIL_APP_PASSWORD:
@@ -659,11 +673,15 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         return False
 
     try:
+        import uuid as _uuid
+        message_id = f"<ppc-{_uuid.uuid4().hex}@ambidsign>"
+
         msg = MIMEMultipart("related")
         msg["Subject"] = subject
         msg["From"] = GMAIL_ADDRESS
         msg["To"] = to_email
         msg["Bcc"] = GMAIL_ADDRESS
+        msg["Message-ID"] = message_id
 
         alternative = MIMEMultipart("alternative")
         msg.attach(alternative)
@@ -684,6 +702,9 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
             server.sendmail(GMAIL_ADDRESS, [to_email, GMAIL_ADDRESS], msg.as_string())
+
+        # Uloz Message-ID pre neskorsi matching odpovedi
+        _save_sent_message_id(message_id, to_email)
 
         log.info(f"Email odoslany na: {to_email}")
         return True

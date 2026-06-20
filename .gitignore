@@ -3,4 +3,6 @@ __pycache__/
 *.pyc
 *.log
 sent_emails.json
+sent_message_ids.json
+seen_replies.json
 report_*.json

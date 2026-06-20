@@ -37,6 +37,7 @@ GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 SEEN_LOG = "seen_replies.json"
+SENT_IDS_LOG = "sent_message_ids.json"
 
 
 # ---------------------------------------------------------------------------
@@ -96,15 +97,29 @@ def get_email_body(msg) -> str:
 # Gmail IMAP - citanie novych odpovedi
 # ---------------------------------------------------------------------------
 
+def load_sent_ids() -> set:
+    """Nacita Message-ID vsetkych odoslanych PPC emailov."""
+    if os.path.exists(SENT_IDS_LOG):
+        with open(SENT_IDS_LOG, "r", encoding="utf-8") as f:
+            return set(json.load(f).keys())
+    return set()
+
+
 def fetch_replies() -> list[dict]:
-    """Prihlasi sa do Gmailu cez IMAP a najde odpovede na nase PPC emaily."""
+    """Najde len odpovede ktore su priamo odpovede na nase PPC emaily (podla In-Reply-To)."""
     replies = []
+    sent_ids = load_sent_ids()
+
+    if not sent_ids:
+        log.info("Ziadne odoslane PPC emaily v logu - nema co sledovat")
+        return replies
+
     try:
         mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=15)
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         mail.select("inbox")
 
-        _, data = mail.search(None, '(SUBJECT "Re:")')
+        _, data = mail.search(None, 'ALL')
         msg_ids = data[0].split() if data[0] else []
 
         for msg_id in msg_ids:
@@ -112,17 +127,21 @@ def fetch_replies() -> list[dict]:
             raw = msg_data[0][1]
             msg = email.message_from_bytes(raw)
 
-            subject = decode_str(msg.get("Subject", ""))
+            # Skontroluj In-Reply-To a References hlavicky
+            in_reply_to = msg.get("In-Reply-To", "").strip()
+            references = msg.get("References", "")
 
-            is_ppc_reply = any(
-                kw in subject
-                for kw in ["PPC reklama", "PPC reklamy", "cenov", "Cenov", "ponuk", "nabídk"]
+            # Je to odpoved na niektorý náš PPC email?
+            is_reply_to_ours = (
+                in_reply_to in sent_ids or
+                any(sid in references for sid in sent_ids)
             )
-            if not is_ppc_reply:
+            if not is_reply_to_ours:
                 continue
 
             msg_uid = msg.get("Message-ID", msg_id.decode())
             sender = decode_str(msg.get("From", ""))
+            subject = decode_str(msg.get("Subject", ""))
             body = get_email_body(msg)
             date_str = msg.get("Date", "")
 
@@ -135,7 +154,7 @@ def fetch_replies() -> list[dict]:
             })
 
         mail.logout()
-        log.info(f"IMAP: najdených {len(replies)} odpovedi na PPC emaily")
+        log.info(f"IMAP: najdených {len(replies)} odpovedi na nase PPC emaily")
     except Exception as e:
         log.error(f"Chyba pri citani IMAP: {e}")
 
