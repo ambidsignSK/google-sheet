@@ -624,7 +624,7 @@ def build_html_body(plain_body: str) -> str:
         for line in lines:
             if not line.strip():
                 # Prazdny riadok = maly odstavec
-                out += '<div style="margin:4px 0;"></div>'
+                out += '<div style="margin:10px 0;"></div>'
                 continue
             # Tucny nadpis: **text**
             if line.startswith("**") and line.endswith("**"):
