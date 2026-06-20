@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Reply Monitor - sleduje odpovede na PPC ponuky, analyzuje ich cez AI,
-vytvara draft odpovede v Gmaile a posiela WhatsApp notifikaciu.
+Reply Monitor - sleduje odpovede na PPC ponuky, analyzuje ich cez AI
+a vytvara draft odpovede v Gmaile. O kazdej odpovedi pride BCC na tvoj email.
 
 Spustenie: python monitor.py
 Odporucane: spustat kazdych 15-30 minut cez Task Scheduler (Windows)
@@ -14,12 +14,10 @@ import time
 import json
 import logging
 import smtplib
-import requests
 from email.header import decode_header
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
-import anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,17 +34,9 @@ log = logging.getLogger(__name__)
 
 GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS", "ambidsign@gmail.com")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
-WHATSAPP_PHONE = os.getenv("WHATSAPP_PHONE", "")    # tvoje cislo s pred. kodom napr. +421907926375
-WHATSAPP_GROUP = os.getenv("WHATSAPP_GROUP", "")    # nazov WhatsApp skupiny (volitelne)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 SEEN_LOG = "seen_replies.json"
-
-# Predmet emailov ktore sme poslali - podla toho filtrujeme odpovede
-SENT_SUBJECTS = [
-    "Cenová ponuka: PPC reklama pre Vašu novú firmu",
-    "Cenová nabídka: PPC reklama pro Vaši novou firmu",
-]
 
 
 # ---------------------------------------------------------------------------
@@ -107,14 +97,13 @@ def get_email_body(msg) -> str:
 # ---------------------------------------------------------------------------
 
 def fetch_replies() -> list[dict]:
-    """Prihlasi sa do Gmailu cez IMAP a najde odpovede na nase emaily."""
+    """Prihlasi sa do Gmailu cez IMAP a najde odpovede na nase PPC emaily."""
     replies = []
     try:
         mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=15)
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         mail.select("inbox")
 
-        # Hladame vsetky emaily s Re: v predmete (ASCII bezpecne)
         _, data = mail.search(None, '(SUBJECT "Re:")')
         msg_ids = data[0].split() if data[0] else []
 
@@ -125,7 +114,6 @@ def fetch_replies() -> list[dict]:
 
             subject = decode_str(msg.get("Subject", ""))
 
-            # Filtruj len odpovede na nase PPC emaily
             is_ppc_reply = any(
                 kw in subject
                 for kw in ["PPC reklama", "PPC reklamy", "cenov", "Cenov", "ponuk", "nabídk"]
@@ -161,10 +149,10 @@ def fetch_replies() -> list[dict]:
 def analyze_and_draft(reply: dict) -> str:
     """Pouzije Claude AI na analyzu odpovede a navrhne text draftu."""
     if not ANTHROPIC_API_KEY:
-        log.warning("ANTHROPIC_API_KEY nie je nastavene - pouzivam zakladny draft")
-        return _basic_draft(reply)
+        return _basic_draft()
 
     try:
+        import anthropic
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
         prompt = f"""Si asistent pre PPC agenturu (ambidsign / @mbi design).
@@ -192,11 +180,10 @@ Pokyny:
 
     except Exception as e:
         log.error(f"AI analyza zlyhala: {e}")
-        return _basic_draft(reply)
+        return _basic_draft()
 
 
-def _basic_draft(reply: dict) -> str:
-    """Zakladny draft bez AI."""
+def _basic_draft() -> str:
     return """Dobrý deň,
 
 ďakujeme za Vašu odpoveď. Radi Vám poskytneme ďalšie informácie.
@@ -216,11 +203,9 @@ ambidesign.eu"""
 # ---------------------------------------------------------------------------
 
 def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
-    """Ulozi draft odpovede priamo do Gmailu cez SMTP (ako draft)."""
+    """Ulozi draft odpovede do Gmailu."""
     try:
-        import base64
-        # Gmail draft cez IMAP APPEND
-        mail = imaplib.IMAP4_SSL("imap.gmail.com")
+        mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=15)
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
 
         msg = MIMEMultipart("alternative")
@@ -229,7 +214,6 @@ def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
         msg["To"] = to_email
         msg.attach(MIMEText(body, "plain", "utf-8"))
 
-        # Uloz do Drafts priecinku
         mail.append(
             "[Gmail]/Drafts",
             "\\Draft",
@@ -245,43 +229,37 @@ def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# WhatsApp notifikacia cez WhatsApp Web (pywhatkit)
+# Notifikacny email pre mna
 # ---------------------------------------------------------------------------
 
-def send_whatsapp(message: str) -> bool:
-    """Posle WhatsApp spravu cez WhatsApp Web v prehliadaci."""
-    if not WHATSAPP_PHONE and not WHATSAPP_GROUP:
-        log.warning("WHATSAPP_PHONE alebo WHATSAPP_GROUP nie su nastavene v .env")
-        return False
-
+def send_notification_email(reply: dict, draft_created: bool):
+    """Posle notifikacny email mne o novej odpovedi klienta."""
     try:
-        import pywhatkit as pwk
+        msg = MIMEMultipart()
+        msg["Subject"] = f"[PPC Agent] Nova odpoved: {reply['subject'][:60]}"
+        msg["From"] = GMAIL_ADDRESS
+        msg["To"] = GMAIL_ADDRESS
 
-        if WHATSAPP_GROUP:
-            # Posli do skupiny podla nazvu
-            pwk.sendwhatmsg_to_group_instantly(
-                group_id=WHATSAPP_GROUP,
-                message=message,
-                wait_time=10,
-                tab_close=True,
-                close_time=3,
-            )
-        else:
-            # Posli priamo na cislo
-            pwk.sendwhatmsg_instantly(
-                phone_no=WHATSAPP_PHONE,
-                message=message,
-                wait_time=10,
-                tab_close=True,
-                close_time=3,
-            )
+        body = f"""Nova odpoved na PPC ponuku!
 
-        log.info("WhatsApp notifikacia odoslana cez WhatsApp Web")
-        return True
+Od: {reply['sender']}
+Predmet: {reply['subject']}
+Datum: {reply['date']}
 
+--- SPRAVA KLIENTA ---
+{reply['body'][:1000]}
+
+--- {'Draft odpovede bol vytvoreny v Gmaile.' if draft_created else 'Draft sa nepodarilo vytvorit.'} ---
+"""
+        msg.attach(MIMEText(body, "plain", "utf-8"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+            server.sendmail(GMAIL_ADDRESS, GMAIL_ADDRESS, msg.as_string())
+
+        log.info("Notifikacny email odoslany")
     except Exception as e:
-        log.error(f"WhatsApp chyba: {e}")
-        return False
+        log.error(f"Chyba pri odosielani notifikacneho emailu: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -304,36 +282,19 @@ def run_monitor():
     for reply in replies:
         uid = reply["uid"]
         if uid in seen:
-            log.info(f"Uz spracovane: {reply['subject'][:50]}")
             continue
 
         log.info(f"Nova odpoved od: {reply['sender']}")
-        log.info(f"Predmet: {reply['subject']}")
 
-        # 1. AI analyza a navrh draftu
         draft_text = analyze_and_draft(reply)
 
-        # 2. Vytvor draft v Gmaile
-        # Ziskaj email adresu zo sendera
         sender_email = reply["sender"]
         if "<" in sender_email:
             sender_email = sender_email.split("<")[1].rstrip(">")
 
-        draft_created = create_gmail_draft(
-            to_email=sender_email,
-            subject=reply["subject"],
-            body=draft_text,
-        )
+        draft_created = create_gmail_draft(sender_email, reply["subject"], draft_text)
 
-        # 3. WhatsApp notifikacia
-        wa_msg = (
-            f"📩 *Nova odpoved na PPC ponuku!*\n\n"
-            f"Od: {reply['sender']}\n"
-            f"Predmet: {reply['subject']}\n\n"
-            f"_{reply['body'][:200]}..._\n\n"
-            f"{'✅ Draft vytvoreny v Gmaile' if draft_created else '⚠️ Draft sa nepodarilo vytvorit'}"
-        )
-        send_whatsapp(wa_msg)
+        send_notification_email(reply, draft_created)
 
         seen.add(uid)
         save_seen(seen)

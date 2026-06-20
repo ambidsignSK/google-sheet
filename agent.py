@@ -663,6 +663,7 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         msg["Subject"] = subject
         msg["From"] = GMAIL_ADDRESS
         msg["To"] = to_email
+        msg["Bcc"] = GMAIL_ADDRESS
 
         alternative = MIMEMultipart("alternative")
         msg.attach(alternative)
@@ -682,7 +683,7 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-            server.sendmail(GMAIL_ADDRESS, to_email, msg.as_string())
+            server.sendmail(GMAIL_ADDRESS, [to_email, GMAIL_ADDRESS], msg.as_string())
 
         log.info(f"Email odoslany na: {to_email}")
         return True
