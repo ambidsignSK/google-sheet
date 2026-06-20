@@ -273,7 +273,241 @@ def fetch_new_companies_cz(days_back: int = 7) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Zdroj 3: Google - dalsi nacitanie web stranok firiem
+# Zdroj 3: Katalogove stranky SK
+# ---------------------------------------------------------------------------
+
+def fetch_from_firmy_sk(pages: int = 3) -> list[dict]:
+    """Scrapuje nove firmy z firmy.sk (zoradene podla datumu zalozenia)."""
+    companies = []
+    base = "https://www.firmy.sk/nove-firmy"
+    for page in range(1, pages + 1):
+        url = f"{base}?page={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=12)
+            soup = BeautifulSoup(r.text, "lxml")
+            for item in soup.select(".companyBox, .firmItem, article.company, .searchResult"):
+                name_el = item.select_one("h2 a, h3 a, .companyName a, .name a")
+                if not name_el:
+                    continue
+                name = name_el.get_text(strip=True)
+                detail_url = name_el.get("href", "")
+                if detail_url and not detail_url.startswith("http"):
+                    detail_url = "https://www.firmy.sk" + detail_url
+                city_el = item.select_one(".address, .city, .location")
+                city = city_el.get_text(strip=True) if city_el else ""
+                email_el = item.select_one("a[href^='mailto:']")
+                email = ""
+                if email_el:
+                    email = email_el["href"].replace("mailto:", "").split("?")[0].strip()
+                if name:
+                    companies.append({
+                        "name": name,
+                        "ico": "",
+                        "city": city,
+                        "country": "SK",
+                        "detail_url": detail_url,
+                        "email": email,
+                        "source": "firmy.sk",
+                    })
+            time.sleep(1)
+        except Exception as e:
+            log.debug(f"firmy.sk strana {page}: {e}")
+    log.info(f"firmy.sk: najdených {len(companies)} firiem")
+    return companies
+
+
+def fetch_from_najfirmy_sk(pages: int = 3) -> list[dict]:
+    """Scrapuje nove firmy z najfirmy.sk."""
+    companies = []
+    for page in range(1, pages + 1):
+        url = f"https://www.najfirmy.sk/nove-firmy/?page={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=12)
+            soup = BeautifulSoup(r.text, "lxml")
+            for item in soup.select(".company-item, .firm, .listing-item, article"):
+                name_el = item.select_one("h2 a, h3 a, .title a, .name a")
+                if not name_el:
+                    continue
+                name = name_el.get_text(strip=True)
+                detail_url = name_el.get("href", "")
+                if detail_url and not detail_url.startswith("http"):
+                    detail_url = "https://www.najfirmy.sk" + detail_url
+                city_el = item.select_one(".address, .city, .mesto")
+                city = city_el.get_text(strip=True) if city_el else ""
+                email = ""
+                email_el = item.select_one("a[href^='mailto:']")
+                if email_el:
+                    email = email_el["href"].replace("mailto:", "").split("?")[0].strip()
+                if name:
+                    companies.append({
+                        "name": name,
+                        "ico": "",
+                        "city": city,
+                        "country": "SK",
+                        "detail_url": detail_url,
+                        "email": email,
+                        "source": "najfirmy.sk",
+                    })
+            time.sleep(1)
+        except Exception as e:
+            log.debug(f"najfirmy.sk strana {page}: {e}")
+    log.info(f"najfirmy.sk: najdených {len(companies)} firiem")
+    return companies
+
+
+def fetch_from_zlatestranky_sk(pages: int = 3) -> list[dict]:
+    """Scrapuje nove firmy zo zlatestranky.sk."""
+    companies = []
+    for page in range(1, pages + 1):
+        url = f"https://www.zlatestranky.sk/nove-firmy/?stranka={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=12)
+            soup = BeautifulSoup(r.text, "lxml")
+            for item in soup.select(".company, .result-item, .zs-company, article"):
+                name_el = item.select_one("h2 a, h3 a, .company-name a")
+                if not name_el:
+                    continue
+                name = name_el.get_text(strip=True)
+                detail_url = name_el.get("href", "")
+                if detail_url and not detail_url.startswith("http"):
+                    detail_url = "https://www.zlatestranky.sk" + detail_url
+                city_el = item.select_one(".address, .city, .obec")
+                city = city_el.get_text(strip=True) if city_el else ""
+                email = ""
+                email_el = item.select_one("a[href^='mailto:']")
+                if email_el:
+                    email = email_el["href"].replace("mailto:", "").split("?")[0].strip()
+                if name:
+                    companies.append({
+                        "name": name,
+                        "ico": "",
+                        "city": city,
+                        "country": "SK",
+                        "detail_url": detail_url,
+                        "email": email,
+                        "source": "zlatestranky.sk",
+                    })
+            time.sleep(1)
+        except Exception as e:
+            log.debug(f"zlatestranky.sk strana {page}: {e}")
+    log.info(f"zlatestranky.sk: najdených {len(companies)} firiem")
+    return companies
+
+
+# ---------------------------------------------------------------------------
+# Zdroj 4: Katalogove stranky CZ
+# ---------------------------------------------------------------------------
+
+def fetch_from_firmy_cz(pages: int = 3) -> list[dict]:
+    """Scrapuje nove firmy z firmy.cz."""
+    companies = []
+    for page in range(1, pages + 1):
+        url = f"https://www.firmy.cz/nove-firmy?page={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=12)
+            soup = BeautifulSoup(r.text, "lxml")
+            for item in soup.select(".companyListItem, .firm-item, article.company, .result"):
+                name_el = item.select_one("h2 a, h3 a, .companyTitle a, .name a")
+                if not name_el:
+                    continue
+                name = name_el.get_text(strip=True)
+                detail_url = name_el.get("href", "")
+                if detail_url and not detail_url.startswith("http"):
+                    detail_url = "https://www.firmy.cz" + detail_url
+                city_el = item.select_one(".address, .city, .locality")
+                city = city_el.get_text(strip=True) if city_el else ""
+                email = ""
+                email_el = item.select_one("a[href^='mailto:']")
+                if email_el:
+                    email = email_el["href"].replace("mailto:", "").split("?")[0].strip()
+                if name:
+                    companies.append({
+                        "name": name,
+                        "ico": "",
+                        "city": city,
+                        "country": "CZ",
+                        "detail_url": detail_url,
+                        "email": email,
+                        "source": "firmy.cz",
+                    })
+            time.sleep(1)
+        except Exception as e:
+            log.debug(f"firmy.cz strana {page}: {e}")
+    log.info(f"firmy.cz: najdených {len(companies)} firiem")
+    return companies
+
+
+def fetch_from_zlatestranky_cz(pages: int = 3) -> list[dict]:
+    """Scrapuje nove firmy zo zlatestranky.cz."""
+    companies = []
+    for page in range(1, pages + 1):
+        url = f"https://www.zlatestranky.cz/nove-firmy/?stranka={page}"
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=12)
+            soup = BeautifulSoup(r.text, "lxml")
+            for item in soup.select(".company, .result-item, article"):
+                name_el = item.select_one("h2 a, h3 a, .company-name a")
+                if not name_el:
+                    continue
+                name = name_el.get_text(strip=True)
+                detail_url = name_el.get("href", "")
+                if detail_url and not detail_url.startswith("http"):
+                    detail_url = "https://www.zlatestranky.cz" + detail_url
+                city_el = item.select_one(".address, .city")
+                city = city_el.get_text(strip=True) if city_el else ""
+                email = ""
+                email_el = item.select_one("a[href^='mailto:']")
+                if email_el:
+                    email = email_el["href"].replace("mailto:", "").split("?")[0].strip()
+                if name:
+                    companies.append({
+                        "name": name,
+                        "ico": "",
+                        "city": city,
+                        "country": "CZ",
+                        "detail_url": detail_url,
+                        "email": email,
+                        "source": "zlatestranky.cz",
+                    })
+            time.sleep(1)
+        except Exception as e:
+            log.debug(f"zlatestranky.cz strana {page}: {e}")
+    log.info(f"zlatestranky.cz: najdených {len(companies)} firiem")
+    return companies
+
+
+def get_email_from_catalog_detail(detail_url: str, country: str) -> str:
+    """Nacita detail firmy z katalogov a skusi najst email."""
+    if not detail_url:
+        return ""
+    try:
+        r = requests.get(detail_url, headers=HEADERS, timeout=10)
+        soup = BeautifulSoup(r.text, "lxml")
+        # Mailto linky
+        for a in soup.find_all("a", href=True):
+            if a["href"].startswith("mailto:"):
+                return a["href"].replace("mailto:", "").split("?")[0].strip().lower()
+        # Text email
+        emails = extract_emails_from_text(soup.get_text())
+        if emails:
+            return emails[0]
+        # Web link z detailu -> scraping kontaktnej stranky
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            if href.startswith("http") and not any(
+                d in href for d in ["firmy.sk", "najfirmy", "zlatestranky", "firmy.cz", "google", "facebook"]
+            ):
+                emails = get_emails_from_url(href)
+                if emails:
+                    return emails[0]
+                break
+    except Exception:
+        pass
+    return ""
+
+
+# ---------------------------------------------------------------------------
+# Zdroj 5: Google - dalsi nacitanie web stranok firiem
 # ---------------------------------------------------------------------------
 
 def enrich_with_google(company: dict) -> dict:
@@ -398,10 +632,26 @@ def run_agent():
 
     sent = load_sent()
 
-    # 1. Zbieranie firiem
+    # 1. Zbieranie firiem - registre + katalogy
     companies = []
     companies.extend(fetch_new_companies_sk(DAYS_BACK))
     companies.extend(fetch_new_companies_cz(DAYS_BACK))
+    companies.extend(fetch_from_firmy_sk())
+    companies.extend(fetch_from_najfirmy_sk())
+    companies.extend(fetch_from_zlatestranky_sk())
+    companies.extend(fetch_from_firmy_cz())
+    companies.extend(fetch_from_zlatestranky_cz())
+
+    # Deduplikacia podla nazvu firmy
+    seen_names = set()
+    unique = []
+    for c in companies:
+        key = c["name"].lower().strip()
+        if key not in seen_names:
+            seen_names.add(key)
+            unique.append(c)
+    companies = unique
+    log.info(f"Po deduplikacii: {len(companies)} unikatnych firiem")
 
     log.info(f"Celkom najdených firiem: {len(companies)}")
 
@@ -417,9 +667,15 @@ def run_agent():
         log.info(f"[{i}/{len(companies)}] Spracovavam: {company['name']} ({company['country']})")
 
         # 2. Ziskat email z ORSR detail
-        if company.get("detail_url") and company["country"] == "SK":
+        if company.get("detail_url") and company["country"] == "SK" and company.get("source") != "firmy.sk":
             detail = get_orsr_detail(company["detail_url"])
             company.update(detail)
+
+        # 2b. Email z katalogoveho detailu (firmy.sk, najfirmy.sk atd.)
+        if not company.get("email") and company.get("detail_url") and company.get("source"):
+            email = get_email_from_catalog_detail(company["detail_url"], company["country"])
+            if email:
+                company["email"] = email
 
         # 3. Obohatit cez Google ak este nemas email
         company = enrich_with_google(company)
