@@ -537,8 +537,6 @@ EMAIL_SUBJECT_CZ = "Cenová nabídka: PPC reklama pro Vaši novou firmu"
 EMAIL_BODY_SK = """\
 Dobrý deň,
 
-gratulujeme k založeniu Vašej novej spoločnosti!
-
 V dnešnej dobe je online viditeľnosť kľúčová pre rýchly rast. Ponúkame Vám profesionálnu správu PPC reklamy (Google Ads, Meta Ads), špeciálne navrhnutú pre nové firmy.
 
 **Čo získate?**
@@ -567,8 +565,6 @@ ambidesign.eu
 
 EMAIL_BODY_CZ = """\
 Dobrý den,
-
-gratulujeme k založení Vaší nové společnosti!
 
 V dnešní době je online viditelnost klíčová pro rychlý růst. Nabízíme Vám profesionální správu PPC reklamy (Google Ads, Meta Ads), speciálně navržené pro nové firmy.
 
