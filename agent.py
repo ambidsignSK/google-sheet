@@ -539,7 +539,8 @@ EMAIL_SUBJECT_CZ = "Cenová nabídka: PPC reklama pro Vaši novou firmu"
 EMAIL_BODY_SK = """\
 Dobrý deň,
 
-V dnešnej dobe je online viditeľnosť kľúčová pre rýchly rast. Ponúkame Vám profesionálnu správu PPC reklamy (Google Ads, Meta Ads), špeciálne navrhnutú pre nové firmy.
+V dnešnej dobe je online viditeľnosť kľúčová pre rýchly rast.
+Ponúkame Vám profesionálnu správu PPC reklamy (Google Ads, Meta Ads), špeciálne navrhnutú pre nové firmy.
 
 **Čo získate?**
 - Nastavenie a správa Google Ads / Facebook & Instagram reklám
@@ -556,7 +557,6 @@ Radi Vám pripravíme bezplatnú analýzu a konkrétny návrh kampane na mieru.
 Neváhajte nás kontaktovať – odpovieme do 24 hodín.
 
 S pozdravom
-
 Tomáš Ambroz
 @mbi design
 +421 907 926 375
@@ -568,7 +568,8 @@ ambidesign.eu
 EMAIL_BODY_CZ = """\
 Dobrý den,
 
-V dnešní době je online viditelnost klíčová pro rychlý růst. Nabízíme Vám profesionální správu PPC reklamy (Google Ads, Meta Ads), speciálně navržené pro nové firmy.
+V dnešní době je online viditelnost klíčová pro rychlý růst.
+Nabízíme Vám profesionální správu PPC reklamy (Google Ads, Meta Ads), speciálně navržené pro nové firmy.
 
 **Co získáte?**
 - Nastavení a správa Google Ads / Facebook & Instagram reklamy
@@ -585,7 +586,6 @@ Rádi Vám připravíme bezplatnou analýzu a konkrétní návrh kampaně na mí
 Neváhejte nás kontaktovat – odpovíme do 24 hodin.
 
 S pozdravem
-
 Tomáš Ambroz
 @mbi design
 +421 907 926 375
@@ -601,13 +601,15 @@ LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
 def build_html_body(plain_body: str) -> str:
     """Konvertuje plain text na HTML s logom v podpise."""
     # Rozdelime telo a podpis (podpis zacina od "S pozdravom")
+    split_marker = None
     if "S pozdravom" in plain_body:
-        split_at = plain_body.index("S pozdravom")
-        content = plain_body[:split_at]
-        signature = plain_body[split_at:]
+        split_marker = "S pozdravom"
     elif "S pozdravem" in plain_body:
-        split_at = plain_body.index("S pozdravem")
-        content = plain_body[:split_at]
+        split_marker = "S pozdravem"
+
+    if split_marker:
+        split_at = plain_body.index(split_marker)
+        content = plain_body[:split_at].rstrip("\n")
         signature = plain_body[split_at:]
     else:
         content = plain_body
