@@ -616,27 +616,33 @@ def build_html_body(plain_body: str) -> str:
     def to_html(text: str) -> str:
         import re as _re
         lines = text.split("\n")
-        html_lines = []
+        out = ""
         for line in lines:
-            # Tučné nadpisy (celý riadok je **text**)
-            if line.startswith("**") and line.endswith("**") and line.count("**") == 2:
-                line = f"<strong>{line[2:-2]}</strong>"
+            if not line.strip():
+                # Prazdny riadok = maly odstavec
+                out += '<div style="margin:4px 0;"></div>'
+                continue
+            # Tucny nadpis: **text**
+            if line.startswith("**") and line.endswith("**"):
+                inner = line[2:-2]
+                out += f"<div><strong>{inner}</strong></div>"
+            # Odradzky
             elif line.startswith("- "):
-                # Tučné slová uprostred riadku (**Štartér** atd.)
-                line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line[2:])
-                line = f"&bull; {line}"
+                inner = line[2:]
+                inner = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', inner)
+                out += f"<div>&bull;&nbsp;{inner}</div>"
+            # Ostatne riadky
             else:
                 line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
-            # Klikatelny odkaz pre ambidesign.eu
-            line = _re.sub(r'(?<![">])(ambidesign\.eu)', r'<a href="https://ambidesign.eu" target="_blank">\1</a>', line)
-            html_lines.append(line if line.strip() else "<br>")
-        return "<br>".join(html_lines)
+                line = _re.sub(r'(?<![">])(ambidesign\.eu)', r'<a href="https://ambidesign.eu" target="_blank">\1</a>', line)
+                out += f"<div>{line}</div>"
+        return out
 
     logo_tag = '<a href="https://ambidesign.eu" target="_blank"><img src="cid:logo" alt="Ambi Design" style="max-width:100px;max-height:100px;margin-top:8px;display:block;border:none;"></a>' if os.path.exists(LOGO_PATH) else ""
 
-    html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.4;">
-<p style="margin:0 0 8px 0;">{to_html(content)}</p>
-<p style="font-size:15px;color:#111;margin:8px 0 4px 0;line-height:1.5;">{to_html(signature)}</p>
+    html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.5;max-width:600px;">
+<div style="margin-bottom:16px;">{to_html(content)}</div>
+<div style="font-size:14px;color:#111;line-height:1.6;">{to_html(signature)}</div>
 {logo_tag}
 </body></html>"""
     return html
