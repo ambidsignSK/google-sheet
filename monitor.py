@@ -114,30 +114,27 @@ def fetch_replies() -> list[dict]:
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
         mail.select("inbox")
 
-        # Hladame emaily s Re: v predmete ktore su odpovede na nase PPC emaily
-        search_queries = []
-        for subj in SENT_SUBJECTS:
-            short = subj[:30]
-            _, data = mail.search(None, f'(SUBJECT "Re:" SUBJECT "{short[:20]}")')
-            if data[0]:
-                search_queries.extend(data[0].split())
-
-        # Aj generalne - emaily od klientov ktore odpovedaju na naše
-        _, data = mail.search(None, '(SUBJECT "Re: Cenov")')
-        if data[0]:
-            search_queries.extend(data[0].split())
-
-        # Unikatne ID
-        msg_ids = list(set(search_queries))
+        # Hladame vsetky emaily s Re: v predmete (ASCII bezpecne)
+        _, data = mail.search(None, '(SUBJECT "Re:")')
+        msg_ids = data[0].split() if data[0] else []
 
         for msg_id in msg_ids:
             _, msg_data = mail.fetch(msg_id, "(RFC822)")
             raw = msg_data[0][1]
             msg = email.message_from_bytes(raw)
 
+            subject = decode_str(msg.get("Subject", ""))
+
+            # Filtruj len odpovede na nase PPC emaily
+            is_ppc_reply = any(
+                kw in subject
+                for kw in ["PPC reklama", "PPC reklamy", "cenov", "Cenov", "ponuk", "nabídk"]
+            )
+            if not is_ppc_reply:
+                continue
+
             msg_uid = msg.get("Message-ID", msg_id.decode())
             sender = decode_str(msg.get("From", ""))
-            subject = decode_str(msg.get("Subject", ""))
             body = get_email_body(msg)
             date_str = msg.get("Date", "")
 
@@ -150,7 +147,7 @@ def fetch_replies() -> list[dict]:
             })
 
         mail.logout()
-        log.info(f"IMAP: najdených {len(replies)} odpovedi")
+        log.info(f"IMAP: najdených {len(replies)} odpovedi na PPC emaily")
     except Exception as e:
         log.error(f"Chyba pri citani IMAP: {e}")
 
