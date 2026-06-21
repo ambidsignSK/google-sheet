@@ -444,23 +444,58 @@ def build_html_body(plain_body: str) -> str:
     import re as _re
     lines = plain_body.split("\n")
     out = ""
+    in_options = False  # sleduje sekciu "Čo navrhujeme / Unser Vorschlag" atd.
+
     for line in lines:
         if not line.strip():
-            out += '<div style="margin:8px 0;"></div>'
+            if in_options:
+                out += '<div style="margin:4px 0;"></div>'
+            else:
+                out += '<div style="margin:8px 0;"></div>'
             continue
+
+        # Nadpis sekcie (tučný) – zároveň začiatok zvýrazneneho bloku
         if line.startswith("**") and line.endswith("**"):
-            out += f"<div><strong>{line[2:-2]}</strong></div>"
-        elif line.startswith("- "):
+            inner = line[2:-2]
+            # Detekcia sekcie s možnosťami
+            if any(kw in inner for kw in [
+                "navrhujeme", "Vorschlag", "proposal", "Javaslatunk", "navrhujeme"
+            ]):
+                in_options = True
+                out += (
+                    f'<div style="background:#e8f0fe;border-left:4px solid #1a56db;'
+                    f'border-radius:0 6px 6px 0;padding:12px 16px;margin:16px 0 8px 0;">'
+                    f'<strong style="font-size:15px;color:#1a3a8f;">{inner}</strong>'
+                )
+            else:
+                in_options = False
+                out += f"<div><strong>{inner}</strong></div>"
+            continue
+
+        # Odrádzky v sekcii – stále vo zvýraznenom bloku
+        if line.startswith("- "):
             inner = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line[2:])
-            out += f"<div>&bull;&nbsp;{inner}</div>"
-        else:
-            line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
-            line = _re.sub(
-                r'(taxi-vienna-bratislava\.com)',
-                r'<a href="https://www.taxi-vienna-bratislava.com" target="_blank">\1</a>',
-                line,
-            )
-            out += f"<div>{line}</div>"
+            if in_options:
+                out += f'<div style="padding:3px 0 3px 4px;color:#1a3a8f;">&bull;&nbsp;{inner}</div>'
+            else:
+                out += f"<div>&bull;&nbsp;{inner}</div>"
+            continue
+
+        # Koniec zvýrazneneho bloku pri prvom normálnom riadku po ňom
+        if in_options:
+            out += '</div>'  # zatvor modrý box
+            in_options = False
+
+        line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
+        line = _re.sub(
+            r'(taxi-vienna-bratislava\.com)',
+            r'<a href="https://www.taxi-vienna-bratislava.com" target="_blank">\1</a>',
+            line,
+        )
+        out += f"<div>{line}</div>"
+
+    if in_options:
+        out += '</div>'  # zatvor box ak je na konci
 
     logo_tag = (
         f'<a href="https://www.{OUR_WEBSITE}" target="_blank">'
