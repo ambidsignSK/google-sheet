@@ -31,6 +31,22 @@ Keď používateľ povie "skontroluj odpovede" alebo "spusti monitor":
 python monitor.py
 ```
 
+## Spustiť hotel backlink agenta
+
+Keď používateľ povie "hľadaj hotely", "oslovi hotely" alebo "spusti hotel agenta":
+
+```bash
+python hotel_backlink_agent.py
+```
+
+Pre testovanie bez odosielania emailov:
+
+```bash
+python hotel_backlink_agent.py --dry-run
+```
+
+Agent hľadá hotely pri letiskách VIE (Viedeň), BTS (Bratislava), BUD (Budapešť) a BRQ (Brno), extrahuje emaily z ich webov a odosiela ponuku spolupráce (spätný odkaz) v jazyku danej krajiny (SK/CZ/DE/HU/EN).
+
 ## Dôležité informácie
 
 - Pracovný priečinok: `C:\Users\ambro\google-sheet\google-sheet`
