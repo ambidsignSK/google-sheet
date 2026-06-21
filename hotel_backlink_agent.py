@@ -20,10 +20,14 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 try:
-    from duckduckgo_search import DDGS
+    from ddgs import DDGS
     DDGS_AVAILABLE = True
 except ImportError:
-    DDGS_AVAILABLE = False
+    try:
+        from duckduckgo_search import DDGS
+        DDGS_AVAILABLE = True
+    except ImportError:
+        DDGS_AVAILABLE = False
 
 load_dotenv()
 
@@ -377,6 +381,12 @@ SKIP_DOMAINS = [
     "hrs.com", "hotelscombined", "lastminute",
 ]
 
+# Povolené TLD – iba európske a relevantné krajiny
+ALLOWED_TLDS = {
+    ".sk", ".cz", ".at", ".hu", ".de", ".ch", ".pl",
+    ".eu", ".com", ".net", ".org", ".info",
+}
+
 
 def google_search_hotels(query: str, num: int = 10) -> list:
     """Hľadá hotely cez DuckDuckGo (bez blokovania)."""
@@ -387,9 +397,17 @@ def google_search_hotels(query: str, num: int = 10) -> list:
             with DDGS() as ddgs:
                 for r in ddgs.text(query, max_results=num * 2):
                     url = r.get("href", "")
-                    if url and not any(skip in url for skip in SKIP_DOMAINS):
-                        if url not in urls:
-                            urls.append(url)
+                    if not url:
+                        continue
+                    if any(skip in url for skip in SKIP_DOMAINS):
+                        continue
+                    # Filter non-EU TLD
+                    tld = "." + urlparse(url).netloc.lower().rsplit(".", 1)[-1]
+                    if tld not in ALLOWED_TLDS:
+                        log.debug(f"Preskakujem non-EU doménu: {url}")
+                        continue
+                    if url not in urls:
+                        urls.append(url)
                     if len(urls) >= num:
                         break
             return urls
