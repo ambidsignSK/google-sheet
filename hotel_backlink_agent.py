@@ -19,8 +19,15 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+try:
+    from googlesearch import search as gsearch
+    GOOGLESEARCH_AVAILABLE = True
+except ImportError:
+    GOOGLESEARCH_AVAILABLE = False
 
 load_dotenv()
+
+DRY_RUN = False  # nastavuje sa cez --dry-run argument
 
 logging.basicConfig(
     level=logging.INFO,
@@ -361,10 +368,34 @@ def get_emails_from_url(url: str, timeout: int = 12) -> list:
     return result
 
 
+SKIP_DOMAINS = [
+    "google.", "booking.com", "tripadvisor", "expedia",
+    "hotels.com", "agoda", "airbnb", "trivago",
+    "kayak.", "skyscanner", "yelp.", "facebook.",
+    "wikipedia.", "youtube.", "twitter.", "instagram.",
+    "maps.google", "translate.google", "hotel.de",
+    "hrs.com", "hotelscombined", "lastminute",
+]
+
+
 def google_search_hotels(query: str, num: int = 10) -> list:
-    """Hľadá hotely cez Google scraping a vracia zoznam URL."""
+    """Hľadá hotely cez googlesearch-python (fallback: priamy scraping)."""
     urls = []
-    search_url = f"https://www.google.com/search?q={requests.utils.quote(query)}&num={num}"
+
+    if GOOGLESEARCH_AVAILABLE:
+        try:
+            for url in gsearch(query, num_results=num, lang="de", sleep_interval=2):
+                if not any(skip in url for skip in SKIP_DOMAINS):
+                    if url not in urls:
+                        urls.append(url)
+                if len(urls) >= num:
+                    break
+            return urls
+        except Exception as e:
+            log.debug(f"googlesearch-python chyba: {e}, skúšam fallback scraping")
+
+    # Fallback: priamy scraping Google
+    search_url = f"https://www.google.com/search?q={requests.utils.quote(query)}&num={num}&hl=de"
     try:
         r = requests.get(search_url, headers=HEADERS, timeout=12)
         soup = BeautifulSoup(r.text, "lxml")
@@ -372,19 +403,12 @@ def google_search_hotels(query: str, num: int = 10) -> list:
             href = a["href"]
             if href.startswith("/url?q="):
                 actual = href.split("/url?q=")[1].split("&")[0]
-                if actual.startswith("http") and not any(
-                    skip in actual for skip in [
-                        "google.", "booking.com", "tripadvisor", "expedia",
-                        "hotels.com", "agoda", "airbnb", "trivago",
-                        "kayak.", "skyscanner", "yelp.", "facebook.",
-                        "wikipedia.", "youtube.", "twitter.", "instagram.",
-                        "maps.google", "translate.google",
-                    ]
-                ):
+                if actual.startswith("http") and not any(skip in actual for skip in SKIP_DOMAINS):
                     if actual not in urls:
                         urls.append(actual)
     except Exception as e:
-        log.debug(f"Google search chyba: {e}")
+        log.debug(f"Google scraping chyba: {e}")
+
     return urls[:num]
 
 
@@ -541,7 +565,10 @@ def run_hotel_agent():
 
                 log.info(f"      → Odosielam [{lang.upper()}] na: {email}")
 
-                if GMAIL_APP_PASSWORD:
+                if DRY_RUN:
+                    log.warning(f"      [DRY RUN] Email by bol odoslaný na: {email} [{lang.upper()}]")
+                    results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run"})
+                elif GMAIL_APP_PASSWORD:
                     success = send_email(email, subject, body)
                     if success:
                         sent.add(email)
@@ -551,7 +578,7 @@ def run_hotel_agent():
                     else:
                         results["hotels"].append({"url": url, "email": email, "region": region["airport"], "status": "error"})
                 else:
-                    log.warning(f"      [DRY RUN] Email by bol odoslaný na: {email} [{lang.upper()}]")
+                    log.warning(f"      [NO PASSWORD] Email by bol odoslaný na: {email} [{lang.upper()}]")
                     results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run"})
 
                 time.sleep(EMAIL_DELAY)
@@ -611,6 +638,7 @@ Legenda: ✅ odoslané | ❌ email nenájdený | ⏭ už odoslané | ⚠️ chyb
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1 and sys.argv[1] == "--dry-run":
-        log.info("DRY RUN mód – emaily sa neodošlú")
+    if "--dry-run" in sys.argv:
+        DRY_RUN = True
+        log.info("🔍 DRY RUN mód – emaily sa NEODOŠLÚ")
     run_hotel_agent()
