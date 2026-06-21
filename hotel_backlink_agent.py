@@ -60,7 +60,7 @@ OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
 SENT_LOG = "hotel_sent_emails.json"
-BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Taxi.svg")
+BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Taxi.png")
 
 HEADERS = {
     "User-Agent": (
@@ -510,24 +510,32 @@ def build_html_body(plain_body: str) -> str:
     if in_options:
         out += flush_options()
 
-    # Banner v podpise (SVG ako inline obrázok)
+    # Banner (PNG) ako inline base64
     banner_tag = ""
     if os.path.exists(BANNER_PATH):
         with open(BANNER_PATH, "rb") as f:
             import base64 as _b64
             b64 = _b64.b64encode(f.read()).decode()
         banner_tag = (
-            f'<div style="margin-top:14px;">'
+            f'<div style="margin-top:20px;padding-top:16px;border-top:1px solid #e0e0e0;text-align:center;">'
             f'<a href="https://www.{OUR_WEBSITE}" target="_blank">'
-            f'<img src="data:image/svg+xml;base64,{b64}" alt="Taxi Vienna Bratislava" '
-            f'style="max-width:300px;display:block;border:none;"></a></div>'
+            f'<img src="data:image/png;base64,{b64}" alt="Taxi Vienna Bratislava" '
+            f'width="540" style="max-width:100%;display:block;margin:0 auto;border:none;border-radius:6px;"></a>'
+            f'</div>'
         )
 
     return (
-        f'<html><body style="font-family:Arial,sans-serif;font-size:14px;'
-        f'color:#222;line-height:1.6;max-width:620px;">'
-        f'<div>{out}</div>'
-        f'{banner_tag}'
+        f'<html><body style="margin:0;padding:0;background:#f4f4f4;">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;">'
+        f'<tr><td align="center" style="padding:24px 12px;">'
+        f'<table width="600" cellpadding="0" cellspacing="0" '
+        f'style="background:#ffffff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden;">'
+        f'<tr><td style="padding:32px 40px;font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.7;">'
+        f'{out}'
+        f'</td></tr>'
+        f'<tr><td style="padding:0 40px 32px 40px;">{banner_tag}</td></tr>'
+        f'</table>'
+        f'</td></tr></table>'
         f'</body></html>'
     )
 
