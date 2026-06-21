@@ -60,7 +60,7 @@ OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
 SENT_LOG = "hotel_sent_emails.json"
-LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "taxi.svg")
 
 HEADERS = {
     "User-Agent": (
@@ -444,46 +444,61 @@ def build_html_body(plain_body: str) -> str:
     import re as _re
     lines = plain_body.split("\n")
     out = ""
-    in_options = False  # sleduje sekciu "Čo navrhujeme / Unser Vorschlag" atd.
+    in_options = False
+    options_lines = []  # zberá body a odrážky celej sekcie
+
+    def flush_options():
+        if not options_lines:
+            return ""
+        content = "".join(options_lines)
+        return (
+            f'<div style="background:#e8f0fe;border-left:4px solid #1a56db;'
+            f'border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;">'
+            f'{content}</div>'
+        )
 
     for line in lines:
         if not line.strip():
             if in_options:
-                out += '<div style="margin:4px 0;"></div>'
+                pass  # prázdne riadky v sekcii ignorujeme
             else:
                 out += '<div style="margin:8px 0;"></div>'
             continue
 
-        # Nadpis sekcie (tučný) – zároveň začiatok zvýrazneneho bloku
         if line.startswith("**") and line.endswith("**"):
             inner = line[2:-2]
-            # Detekcia sekcie s možnosťami
-            if any(kw in inner for kw in [
-                "navrhujeme", "Vorschlag", "proposal", "Javaslatunk", "navrhujeme"
-            ]):
+            if any(kw in inner for kw in ["navrhujeme", "Vorschlag", "proposal", "Javaslatunk"]):
+                # Začiatok zvýraznenej sekcie
+                if in_options:
+                    out += flush_options()
+                    options_lines.clear()
                 in_options = True
-                out += (
-                    f'<div style="background:#e8f0fe;border-left:4px solid #1a56db;'
-                    f'border-radius:0 6px 6px 0;padding:12px 16px;margin:16px 0 8px 0;">'
-                    f'<strong style="font-size:15px;color:#1a3a8f;">{inner}</strong>'
+                options_lines.append(
+                    f'<div style="font-weight:700;font-size:15px;color:#1a3a8f;margin-bottom:8px;">{inner}</div>'
                 )
             else:
-                in_options = False
+                if in_options:
+                    out += flush_options()
+                    options_lines.clear()
+                    in_options = False
                 out += f"<div><strong>{inner}</strong></div>"
             continue
 
-        # Odrádzky v sekcii – stále vo zvýraznenom bloku
         if line.startswith("- "):
             inner = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line[2:])
             if in_options:
-                out += f'<div style="padding:3px 0 3px 4px;color:#1a3a8f;">&bull;&nbsp;{inner}</div>'
+                options_lines.append(
+                    f'<div style="padding:4px 0;color:#1a3a8f;">'
+                    f'<span style="font-weight:700;margin-right:6px;">•</span>{inner}</div>'
+                )
             else:
                 out += f"<div>&bull;&nbsp;{inner}</div>"
             continue
 
-        # Koniec zvýrazneneho bloku pri prvom normálnom riadku po ňom
+        # Normálny riadok – zatvor sekciu ak bola otvorená
         if in_options:
-            out += '</div>'  # zatvor modrý box
+            out += flush_options()
+            options_lines.clear()
             in_options = False
 
         line = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
@@ -495,18 +510,28 @@ def build_html_body(plain_body: str) -> str:
         out += f"<div>{line}</div>"
 
     if in_options:
-        out += '</div>'  # zatvor box ak je na konci
+        out += flush_options()
 
-    logo_tag = (
-        f'<a href="https://www.{OUR_WEBSITE}" target="_blank">'
-        f'<img src="cid:logo" alt="Taxi Vienna Bratislava" '
-        f'style="max-width:120px;margin-top:12px;display:block;border:none;"></a>'
-    ) if os.path.exists(LOGO_PATH) else ""
+    # Banner v podpise (SVG ako inline obrázok)
+    banner_tag = ""
+    if os.path.exists(BANNER_PATH):
+        with open(BANNER_PATH, "rb") as f:
+            import base64 as _b64
+            b64 = _b64.b64encode(f.read()).decode()
+        banner_tag = (
+            f'<div style="margin-top:14px;">'
+            f'<a href="https://www.{OUR_WEBSITE}" target="_blank">'
+            f'<img src="data:image/svg+xml;base64,{b64}" alt="Taxi Vienna Bratislava" '
+            f'style="max-width:300px;display:block;border:none;"></a></div>'
+        )
 
-    return f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;max-width:620px;">
-<div>{out}</div>
-{logo_tag}
-</body></html>"""
+    return (
+        f'<html><body style="font-family:Arial,sans-serif;font-size:14px;'
+        f'color:#222;line-height:1.6;max-width:620px;">'
+        f'<div>{out}</div>'
+        f'{banner_tag}'
+        f'</body></html>'
+    )
 
 
 def send_email(to_email: str, subject: str, body: str) -> bool:
@@ -524,17 +549,11 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         msg["Bcc"] = GMAIL_ADDRESS
         msg["Message-ID"] = message_id
 
+        # Banner je vložený ako base64 priamo v HTML – nepotrebujeme MIMEImage prílohu
         alt = MIMEMultipart("alternative")
         msg.attach(alt)
         alt.attach(MIMEText(body, "plain", "utf-8"))
         alt.attach(MIMEText(build_html_body(body), "html", "utf-8"))
-
-        if os.path.exists(LOGO_PATH):
-            with open(LOGO_PATH, "rb") as f:
-                img = MIMEImage(f.read(), _subtype="jpeg")
-            img.add_header("Content-ID", "<logo>")
-            img.add_header("Content-Disposition", "inline", filename="logo.jpg")
-            msg.attach(img)
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
