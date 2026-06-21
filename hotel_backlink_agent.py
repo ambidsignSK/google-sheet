@@ -120,11 +120,11 @@ AIRPORT_REGIONS = [
 # ---------------------------------------------------------------------------
 
 SUBJECTS = {
-    "sk": "Spolupráca a spätný odkaz – Taxi Viedeň–Bratislava",
-    "cs": "Spolupráce a zpětný odkaz – Taxi Vídeň–Bratislava",
-    "de": "Kooperationsanfrage & Backlink – Taxi Wien–Bratislava",
-    "hu": "Együttműködési ajánlat – Taxi Bécs–Pozsony",
-    "en": "Partnership & Backlink Request – Taxi Vienna–Bratislava",
+    "sk": "Ponuka spolupráce pre Váš hotel – Taxi Viedeň–Bratislava",
+    "cs": "Nabídka spolupráce pro Váš hotel – Taxi Vídeň–Bratislava",
+    "de": "Kooperationsangebot für Ihr Hotel – Taxi Wien–Bratislava",
+    "hu": "Együttműködési ajánlat szállodájának – Taxi Bécs–Pozsony",
+    "en": "Partnership Proposal for Your Hotel – Taxi Vienna–Bratislava",
 }
 
 BODIES = {
@@ -136,11 +136,15 @@ obraciam sa na Vás s priateľskou ponukou spolupráce, ktorá by mohla byť pr�
 Prevádzkujeme letiskovú taxislužbu **taxi-vienna-bratislava.com** – zabezpečujeme pohodlné a spoľahlivé transfery medzi Viedňou, Bratislavou a okolitými letiskami (VIE, BTS). Naší zákazníci sú práve cestujúci, ktorí vyhľadávajú ubytovanie v oblasti letísk – teda presne Vaši potenciálni hostia.
 
 **Čo navrhujeme?**
-Radi by sme si vymenili partnerské odkazy, prípadne by sme Vás uviedli na našom webe v sekcii odporúčaných hotelov. Na oplátku by sme ocenili krátku zmienku alebo odkaz na taxi-vienna-bratislava.com na Vašej stránke (napr. v sekcii „Doprava", „Ako k nám" alebo „Partneri").
+Radi by sme nadviazali spoluprácu v niektorej z týchto foriem – podľa toho, čo Vám najviac vyhovuje:
 
-Táto spolupráca je bezplatná a pre Vašich hostí môže byť skutočne užitočná – vedia tak vopred zabezpečiť transfer z letiska priamo k Vám.
+- Výmena partnerských odkazov (my Vás uvedieme v sekcii odporúčaných hotelov, Vy nám odkaz v sekcii „Doprava" alebo „Partneri")
+- Umiestnenie nášho reklamného bannera na Vašom webe – dodáme grafiku v požadovanej veľkosti, bez nároku na poplatky
+- Kombinácia oboch možností
 
-Ak Vás ponuka zaujíma, stačí odpovedať na tento email – radi sa dohodneme na detailoch.
+Táto spolupráca je pre Vás bezplatná a pre Vašich hostí skutočne praktická – môžu si vopred zabezpečiť transfer z letiska priamo k Vám.
+
+Ak Vás niektorá z možností zaujíma, stačí odpovedať na tento email – radi sa dohodneme na detailoch.
 
 Ďakujeme za čas a tešíme sa na prípadnú spoluprácu!
 
@@ -160,11 +164,15 @@ obracím se na Vás s přátelskou nabídkou spolupráce, která by mohla být p
 Provozujeme letištní taxislužbu **taxi-vienna-bratislava.com** – zajišťujeme pohodlné a spolehlivé transfery mezi Vídní, Bratislavou a okolními letišti (VIE, BTS). Naší zákazníci jsou právě cestující, kteří hledají ubytování v oblasti letišť – tedy přesně Vaši potenciální hosté.
 
 **Co navrhujeme?**
-Rádi bychom si vyměnili partnerské odkazy, případně Vás uvedli na našem webu v sekci doporučených hotelů. Na oplátku bychom ocenili krátkou zmínku nebo odkaz na taxi-vienna-bratislava.com na Vaší stránce (např. v sekci „Doprava", „Jak k nám" nebo „Partneři").
+Rádi bychom navázali spolupráci v některé z těchto forem – podle toho, co Vám nejvíce vyhovuje:
 
-Tato spolupráce je bezplatná a pro Vaše hosty může být skutečně užitečná – mohou si tak předem zajistit transfer z letiště přímo k Vám.
+- Výměna partnerských odkazů (my Vás uvedeme v sekci doporučených hotelů, Vy nám odkaz v sekci „Doprava" nebo „Partneři")
+- Umístění našeho reklamního banneru na Vašem webu – dodáme grafiku v požadované velikosti, bez nároku na poplatky
+- Kombinace obou možností
 
-Pokud Vás nabídka zaujme, stačí odpovědět na tento email – rádi se domluvíme na detailech.
+Tato spolupráce je pro Vás bezplatná a pro Vaše hosty skutečně praktická – mohou si předem zajistit transfer z letiště přímo k Vám.
+
+Pokud Vás některá z možností zaujme, stačí odpovědět na tento email – rádi se domluvíme na detailech.
 
 Děkujeme za čas a těšíme se na případnou spolupráci!
 
@@ -184,9 +192,13 @@ ich melde mich bei Ihnen mit einem freundlichen Kooperationsangebot, das für be
 Wir betreiben den Flughafentransfer-Service **taxi-vienna-bratislava.com** – wir bieten bequeme und zuverlässige Transfers zwischen Wien, Bratislava und den umliegenden Flughäfen (VIE, BTS). Unsere Kunden sind genau die Reisenden, die in der Nähe der Flughäfen eine Unterkunft suchen – also potenzielle Gäste für Ihr Haus.
 
 **Unser Vorschlag:**
-Wir würden uns freuen, Partnerlinks auszutauschen oder Sie auf unserer Website in der Rubrik „Empfohlene Hotels" zu nennen. Im Gegenzug wären wir dankbar für eine kurze Erwähnung oder einen Link zu taxi-vienna-bratislava.com auf Ihrer Website (z. B. unter „Anreise", „So finden Sie uns" oder „Partner").
+Wir würden uns freuen, eine Zusammenarbeit in einer der folgenden Formen zu starten – ganz wie es für Sie am besten passt:
 
-Diese Zusammenarbeit ist kostenlos und kann für Ihre Gäste sehr hilfreich sein – sie können so schon im Voraus einen Transfer vom Flughafen direkt zu Ihnen buchen.
+- Austausch von Partnerlinks (wir nennen Sie in unserer Rubrik „Empfohlene Hotels", Sie verlinken uns unter „Anreise" oder „Partner")
+- Platzierung unseres Werbebannners auf Ihrer Website – wir liefern die Grafik in der gewünschten Größe, kostenlos für Sie
+- Kombination beider Möglichkeiten
+
+Diese Zusammenarbeit ist für Sie kostenlos und für Ihre Gäste wirklich praktisch – sie können schon im Voraus einen Transfer vom Flughafen direkt zu Ihnen buchen.
 
 Wenn Sie interessiert sind, antworten Sie einfach auf diese E-Mail – wir besprechen gerne die Details.
 
@@ -208,9 +220,13 @@ barátságos együttműködési javaslattal fordulok Önhöz, amely mindkét fé
 Mi a **taxi-vienna-bratislava.com** repülőtéri transzfer szolgáltatást üzemeltetjük – kényelmes és megbízható transzfereket biztosítunk Bécs, Pozsony és a környező repülőterek (VIE, BTS) között. Ügyfeleink pontosan azok az utazók, akik a repülőterek közelében keresnek szállást – tehát az Ön potenciális vendégei.
 
 **Javaslatunk:**
-Szívesen cserélnénk partnerlinks-eket, vagy feltüntetnénk Önt weboldalunkon az ajánlott szállodák között. Cserébe hálásak lennénk egy rövid megemlítésért vagy linkért a taxi-vienna-bratislava.com oldalra az Ön weboldalán (pl. „Megközelítés", „Hogyan juthat el hozzánk" vagy „Partnerek" rovatban).
+Szívesen indítanánk együttműködést az alábbi formák egyikében – attól függően, ami Önnek a legjobban megfelel:
 
-Ez az együttműködés ingyenes, és valóban hasznos lehet vendégei számára – így előre megszervezhetik a repülőtéri transzfert közvetlenül az Ön szállodájához.
+- Partnerlink-csere (mi feltüntetjük Önt az ajánlott szállodák között, Ön linkel minket a „Megközelítés" vagy „Partnerek" rovatban)
+- Reklámbannerünk elhelyezése az Ön weboldalán – a grafikát kívánt méretben szállítjuk, Önnek ingyenesen
+- A két lehetőség kombinációja
+
+Ez az együttműködés Önnek ingyenes, és vendégei számára igazán praktikus – így előre megszervezhetik a repülőtéri transzfert közvetlenül az Ön szállodájához.
 
 Ha az ajánlat felkeltette érdeklődését, egyszerűen válaszoljon erre az e-mailre – szívesen egyeztetünk a részletekről.
 
@@ -232,9 +248,13 @@ I am reaching out with a friendly cooperation proposal that could be mutually be
 We operate **taxi-vienna-bratislava.com** – a comfortable and reliable airport transfer service between Vienna, Bratislava, and surrounding airports (VIE, BTS). Our customers are exactly the travelers who are looking for accommodation near airports – your potential guests.
 
 **Our proposal:**
-We would be happy to exchange partner links, or list your hotel on our website under recommended accommodations. In return, we would appreciate a brief mention or a link to taxi-vienna-bratislava.com on your website (e.g., under "Getting Here", "Transport", or "Partners").
+We would love to start a cooperation in one of the following forms – whichever works best for you:
 
-This cooperation is completely free and can be genuinely useful for your guests – they can arrange their airport transfer directly to your hotel in advance.
+- Partner link exchange (we list your hotel on our website under recommended accommodations, you link to us under "Getting Here" or "Partners")
+- Placing our advertising banner on your website – we provide the artwork in any size you need, free of charge
+- A combination of both options
+
+This cooperation is completely free for you and genuinely practical for your guests – they can arrange their airport transfer directly to your hotel in advance.
 
 If you are interested, simply reply to this email and we can discuss the details.
 
