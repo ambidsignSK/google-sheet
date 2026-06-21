@@ -221,11 +221,26 @@ ambidesign.eu"""
 # Vytvorenie draftu v Gmaile
 # ---------------------------------------------------------------------------
 
+def find_drafts_folder(mail) -> str:
+    """Najde spravny nazov priecinka pre Drafts (rozne jazykove verzie Gmailu)."""
+    _, folders = mail.list()
+    for folder in folders:
+        folder_str = folder.decode("utf-8") if isinstance(folder, bytes) else folder
+        if "\\Drafts" in folder_str or "Drafts" in folder_str or "Koncepty" in folder_str:
+            parts = folder_str.split('"')
+            if len(parts) >= 2:
+                return parts[-2]
+    return "[Gmail]/Drafts"
+
+
 def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
     """Ulozi draft odpovede do Gmailu."""
     try:
         mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=15)
         mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+
+        drafts_folder = find_drafts_folder(mail)
+        log.info(f"Drafts priecinok: {drafts_folder}")
 
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject if subject.startswith("Re:") else f"Re: {subject}"
@@ -234,7 +249,7 @@ def create_gmail_draft(to_email: str, subject: str, body: str) -> bool:
         msg.attach(MIMEText(body, "plain", "utf-8"))
 
         mail.append(
-            "[Gmail]/Drafts",
+            drafts_folder,
             "\\Draft",
             imaplib.Time2Internaldate(time.time()),
             msg.as_bytes(),
