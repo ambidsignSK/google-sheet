@@ -566,7 +566,7 @@ def run_hotel_agent():
             subject = SUBJECTS.get(lang, SUBJECTS["en"])
             body_template = BODIES.get(lang, BODIES["en"])
             title = OUR_TITLES.get(lang, OUR_TITLES["en"])
-        body = body_template.format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
+            body = body_template.format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
 
             for email in emails[:1]:  # prvý nájdený email
                 results["emails_found"] += 1
