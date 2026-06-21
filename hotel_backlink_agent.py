@@ -49,7 +49,13 @@ EMAIL_DELAY = int(os.getenv("EMAIL_DELAY", "15"))
 
 OUR_WEBSITE = "taxi-vienna-bratislava.com"
 OUR_NAME = "Tomáš Ambroz"
-OUR_TITLE = "Marketingový manažér"
+OUR_TITLES = {
+    "sk": "Marketingový manažér",
+    "cs": "Marketingový manažér",
+    "de": "Marketing Manager",
+    "hu": "Marketing menedzser",
+    "en": "Marketing Manager",
+}
 OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
@@ -210,7 +216,7 @@ Wir betreiben den Flughafentransfer-Service **taxi-vienna-bratislava.com** – w
 Wir würden uns freuen, eine Zusammenarbeit in einer der folgenden Formen zu starten – ganz wie es für Sie am besten passt:
 
 - Austausch von Partnerlinks (wir nennen Sie in unserer Rubrik „Empfohlene Hotels", Sie verlinken uns unter „Anreise" oder „Partner")
-- Platzierung unseres Werbebannners auf Ihrer Website – wir liefern die Grafik in der gewünschten Größe, kostenlos für Sie
+- Platzierung unseres Werbebanners auf Ihrer Website – wir liefern die Grafik in der gewünschten Größe, kostenlos für Sie
 - Kombination beider Möglichkeiten
 
 Diese Zusammenarbeit ist für Sie kostenlos und für Ihre Gäste wirklich praktisch – sie können schon im Voraus einen Transfer vom Flughafen direkt zu Ihnen buchen.
@@ -559,7 +565,8 @@ def run_hotel_agent():
             lang = detect_hotel_language(url, region["country"])
             subject = SUBJECTS.get(lang, SUBJECTS["en"])
             body_template = BODIES.get(lang, BODIES["en"])
-            body = body_template.format(name=OUR_NAME, title=OUR_TITLE, company=OUR_COMPANY, phone=OUR_PHONE)
+            title = OUR_TITLES.get(lang, OUR_TITLES["en"])
+        body = body_template.format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
 
             for email in emails[:1]:  # prvý nájdený email
                 results["emails_found"] += 1

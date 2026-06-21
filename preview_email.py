@@ -9,17 +9,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from hotel_backlink_agent import (
-    SUBJECTS, BODIES, OUR_NAME, OUR_TITLE, OUR_COMPANY, OUR_PHONE,
+    SUBJECTS, BODIES, OUR_NAME, OUR_TITLES, OUR_COMPANY, OUR_PHONE,
     GMAIL_ADDRESS, GMAIL_APP_PASSWORD, build_html_body,
 )
 
 lang = sys.argv[1] if len(sys.argv) > 1 else "sk"
+lang = {"cz": "cs"}.get(lang, lang)  # alias
 if lang not in SUBJECTS:
     print(f"Neznamy jazyk: {lang}. Moznosti: {', '.join(SUBJECTS.keys())}")
     sys.exit(1)
 
 subject = f"[PREVIEW {lang.upper()}] {SUBJECTS[lang]}"
-body = BODIES[lang].format(name=OUR_NAME, title=OUR_TITLE, company=OUR_COMPANY, phone=OUR_PHONE)
+title = OUR_TITLES.get(lang, OUR_TITLES["en"])
+body = BODIES[lang].format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
 
 print("=" * 60)
 print(f"PREDMET: {SUBJECTS[lang]}")
