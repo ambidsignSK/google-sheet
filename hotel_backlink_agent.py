@@ -101,6 +101,18 @@ AIRPORT_REGIONS = [
             "hotel Brno letisko airport",
         ],
     },
+    {
+        "airport": "Prague Airport (PRG)",
+        "country": "CZ",
+        "lang": "cs",
+        "queries": [
+            "hotel letiště Praha Václav Havel",
+            "hotel Praha Ruzyně letiště",
+            "airport hotel Prague PRG",
+            "hotel u letiště Praha",
+            "hotel Ruzyně Praha airport",
+        ],
+    },
 ]
 
 # ---------------------------------------------------------------------------
