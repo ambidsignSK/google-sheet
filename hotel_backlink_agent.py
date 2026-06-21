@@ -20,10 +20,10 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 try:
-    from googlesearch import search as gsearch
-    GOOGLESEARCH_AVAILABLE = True
+    from duckduckgo_search import DDGS
+    DDGS_AVAILABLE = True
 except ImportError:
-    GOOGLESEARCH_AVAILABLE = False
+    DDGS_AVAILABLE = False
 
 load_dotenv()
 
@@ -379,37 +379,26 @@ SKIP_DOMAINS = [
 
 
 def google_search_hotels(query: str, num: int = 10) -> list:
-    """Hľadá hotely cez googlesearch-python (fallback: priamy scraping)."""
+    """Hľadá hotely cez DuckDuckGo (bez blokovania)."""
     urls = []
 
-    if GOOGLESEARCH_AVAILABLE:
+    if DDGS_AVAILABLE:
         try:
-            for url in gsearch(query, num_results=num, lang="de", sleep_interval=2):
-                if not any(skip in url for skip in SKIP_DOMAINS):
-                    if url not in urls:
-                        urls.append(url)
-                if len(urls) >= num:
-                    break
+            with DDGS() as ddgs:
+                for r in ddgs.text(query, max_results=num * 2):
+                    url = r.get("href", "")
+                    if url and not any(skip in url for skip in SKIP_DOMAINS):
+                        if url not in urls:
+                            urls.append(url)
+                    if len(urls) >= num:
+                        break
             return urls
         except Exception as e:
-            log.debug(f"googlesearch-python chyba: {e}, skúšam fallback scraping")
+            log.debug(f"DuckDuckGo search chyba: {e}")
+    else:
+        log.warning("duckduckgo-search nie je nainštalovaný. Spusti: pip install duckduckgo-search")
 
-    # Fallback: priamy scraping Google
-    search_url = f"https://www.google.com/search?q={requests.utils.quote(query)}&num={num}&hl=de"
-    try:
-        r = requests.get(search_url, headers=HEADERS, timeout=12)
-        soup = BeautifulSoup(r.text, "lxml")
-        for a in soup.find_all("a", href=True):
-            href = a["href"]
-            if href.startswith("/url?q="):
-                actual = href.split("/url?q=")[1].split("&")[0]
-                if actual.startswith("http") and not any(skip in actual for skip in SKIP_DOMAINS):
-                    if actual not in urls:
-                        urls.append(actual)
-    except Exception as e:
-        log.debug(f"Google scraping chyba: {e}")
-
-    return urls[:num]
+    return urls
 
 
 def detect_hotel_language(url: str, country: str) -> str:
