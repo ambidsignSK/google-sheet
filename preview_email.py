@@ -31,7 +31,7 @@ print("=" * 60)
 
 if GMAIL_APP_PASSWORD:
     answer = input(f"\nPoslat preview na {GMAIL_ADDRESS}? [a/n]: ").strip().lower()
-    if answer == "a":
+    if answer in ("a", "y", ""):
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = GMAIL_ADDRESS
