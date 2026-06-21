@@ -38,6 +38,8 @@ EMAIL_DELAY = int(os.getenv("EMAIL_DELAY", "15"))
 
 OUR_WEBSITE = "taxi-vienna-bratislava.com"
 OUR_NAME = "Tomáš Ambroz"
+OUR_TITLE = "Marketingový manažér"
+OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
 SENT_LOG = "hotel_sent_emails.json"
@@ -151,7 +153,8 @@ Ak Vás niektorá z možností zaujíma, stačí odpovedať na tento email – r
 S priateľským pozdravom
 
 {name}
-Taxi Viedeň – Bratislava
+{title} | {company}
+Prevádzkovateľ taxi-vienna-bratislava.com
 {phone}
 www.taxi-vienna-bratislava.com
 """,
@@ -179,7 +182,8 @@ Děkujeme za čas a těšíme se na případnou spolupráci!
 S přátelským pozdravem
 
 {name}
-Taxi Vídeň – Bratislava
+{title} | {company}
+Provozovatel taxi-vienna-bratislava.com
 {phone}
 www.taxi-vienna-bratislava.com
 """,
@@ -207,7 +211,8 @@ Vielen Dank für Ihre Zeit und wir freuen uns auf eine mögliche Zusammenarbeit!
 Mit freundlichen Grüßen
 
 {name}
-Taxi Wien – Bratislava
+{title} | {company}
+Betreiber von taxi-vienna-bratislava.com
 {phone}
 www.taxi-vienna-bratislava.com
 """,
@@ -235,7 +240,8 @@ Köszönjük az idejét, és várjuk esetleges együttműködésünket!
 Barátsággal,
 
 {name}
-Taxi Bécs – Pozsony
+{title} | {company}
+A taxi-vienna-bratislava.com üzemeltetője
 {phone}
 www.taxi-vienna-bratislava.com
 """,
@@ -263,7 +269,8 @@ Thank you for your time, and we look forward to a possible partnership!
 Kind regards,
 
 {name}
-Taxi Vienna – Bratislava
+{title} | {company}
+Operator of taxi-vienna-bratislava.com
 {phone}
 www.taxi-vienna-bratislava.com
 """,
@@ -521,7 +528,7 @@ def run_hotel_agent():
             lang = detect_hotel_language(url, region["country"])
             subject = SUBJECTS.get(lang, SUBJECTS["en"])
             body_template = BODIES.get(lang, BODIES["en"])
-            body = body_template.format(name=OUR_NAME, phone=OUR_PHONE)
+            body = body_template.format(name=OUR_NAME, title=OUR_TITLE, company=OUR_COMPANY, phone=OUR_PHONE)
 
             for email in emails[:1]:  # prvý nájdený email
                 results["emails_found"] += 1
