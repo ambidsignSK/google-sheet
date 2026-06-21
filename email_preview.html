@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Preview – Taxi Vienna Bratislava</title>
+<style>
+  body { background: #e8e8e8; margin: 0; padding: 30px; font-family: Arial, sans-serif; }
+  .email-client { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+
+  /* Email client header bar */
+  .client-bar { background: #f1f3f4; padding: 12px 20px; border-bottom: 1px solid #ddd; font-size: 13px; color: #555; }
+  .client-bar .field { margin-bottom: 4px; }
+  .client-bar .label { color: #888; min-width: 60px; display: inline-block; }
+  .client-bar .value { color: #222; font-weight: 500; }
+  .client-bar .subject-line { font-size: 16px; font-weight: 600; color: #111; margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; }
+
+  /* Email body */
+  .email-body { padding: 36px 40px 30px 40px; font-size: 14px; color: #222; line-height: 1.7; }
+  .email-body p { margin: 0 0 14px 0; }
+  .email-body strong { color: #111; }
+  .email-body .intro { font-size: 14px; }
+
+  .options-box {
+    background: #f8f9ff;
+    border-left: 4px solid #1a56db;
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin: 18px 0;
+  }
+  .options-box .box-title { font-weight: 700; margin-bottom: 10px; color: #111; font-size: 14px; }
+  .options-box ul { margin: 0; padding: 0; list-style: none; }
+  .options-box ul li { padding: 5px 0; padding-left: 22px; position: relative; color: #333; }
+  .options-box ul li::before { content: "✓"; position: absolute; left: 0; color: #1a56db; font-weight: 700; }
+  .options-box ul li strong { color: #1a56db; }
+
+  .closing { margin-top: 20px; }
+
+  /* Signature */
+  .signature {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #444;
+    line-height: 1.6;
+  }
+  .signature .sig-name { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 2px; }
+  .signature .sig-company { font-size: 14px; font-weight: 600; color: #1a56db; }
+  .signature .sig-phone { color: #555; }
+  .signature .sig-web a { color: #1a56db; text-decoration: none; font-weight: 600; }
+  .signature .sig-web a:hover { text-decoration: underline; }
+
+  .banner-preview {
+    margin-top: 16px;
+    display: inline-block;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    border-radius: 8px;
+    padding: 14px 22px;
+    color: #fff;
+    font-size: 13px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+  }
+  .banner-preview .b-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .banner-preview .b-sub { font-size: 11px; color: #aac4ff; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .banner-preview .b-cta {
+    display: inline-block;
+    background: #f5c518;
+    color: #111;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 4px;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+  .banner-label { font-size: 11px; color: #888; margin-top: 6px; }
+
+  /* Language tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid #1a56db; margin-bottom: 0; }
+  .tab {
+    padding: 9px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #f1f3f4;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    color: #555;
+    border-radius: 4px 4px 0 0;
+    margin-right: 3px;
+    transition: background 0.15s;
+  }
+  .tab.active { background: #1a56db; color: #fff; border-color: #1a56db; font-weight: 600; }
+  .lang-content { display: none; }
+  .lang-content.active { display: block; }
+
+  .preview-label { font-size: 12px; color: #888; text-align: center; margin-bottom: 16px; letter-spacing: 1px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div style="max-width:680px;margin:0 auto 16px auto;">
+  <div class="preview-label">📧 Ukážka emailu – Hotel Backlink Agent</div>
+
+  <!-- Language tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchLang('sk')">🇸🇰 SK</div>
+    <div class="tab" onclick="switchLang('cs')">🇨🇿 CZ</div>
+    <div class="tab" onclick="switchLang('de')">🇦🇹 DE</div>
+    <div class="tab" onclick="switchLang('hu')">🇭🇺 HU</div>
+    <div class="tab" onclick="switchLang('en')">🌐 EN</div>
+  </div>
+</div>
+
+<!-- ===== SLOVAK ===== -->
+<div id="lang-sk" class="lang-content active">
+<div class="email-client">
+  <div class="client-bar">
+    <div class="field"><span class="label">Od:</span> <span class="value">Tomáš Ambroz &lt;ambidsign@gmail.com&gt;</span></div>
+    <div class="field"><span class="label">Komu:</span> <span class="value">info@hotelpriletisku.sk</span></div>
+    <div class="field"><span class="label">BCC:</span> <span class="value">ambidsign@gmail.com</span></div>
+    <div class="subject-line">Ponuka spolupráce pre Váš hotel – Taxi Viedeň–Bratislava</div>
+  </div>
+  <div class="email-body">
+    <p class="intro">Dobrý deň,</p>
+    <p>obraciam sa na Vás s priateľskou ponukou spolupráce, ktorá by mohla byť prínosom pre nás oboch.</p>
+    <p>Prevádzkujeme letiskovú taxislužbu <strong>taxi-vienna-bratislava.com</strong> – zabezpečujeme pohodlné a spoľahlivé transfery medzi Viedňou, Bratislavou a okolitými letiskami (VIE, BTS). Naší zákazníci sú práve cestujúci, ktorí vyhľadávajú ubytovanie v oblasti letísk – teda presne Vaši potenciálni hostia.</p>
+
+    <div class="options-box">
+      <div class="box-title">Čo navrhujeme?</div>
+      <ul>
+        <li>Výmena partnerských odkazov – my Vás uvedieme v sekcii odporúčaných hotelov, Vy nám odkaz v sekcii „Doprava" alebo „Partneri"</li>
+        <li><strong>Umiestnenie nášho reklamného bannera na Vašom webe</strong> – dodáme grafiku v požadovanej veľkosti, bez nároku na poplatky</li>
+        <li>Kombinácia oboch možností</li>
+      </ul>
+    </div>
+
+    <p>Táto spolupráca je pre Vás bezplatná a pre Vašich hostí skutočne praktická – môžu si vopred zabezpečiť transfer z letiska priamo k Vám.</p>
+    <p class="closing">Ak Vás niektorá z možností zaujíma, stačí odpovedať na tento email – radi sa dohodneme na detailoch.</p>
+    <p>Ďakujeme za čas a tešíme sa na prípadnú spoluprácu!</p>
+
+    <div class="signature">
+      <div class="sig-name">Tomáš Ambroz</div>
+      <div class="sig-company">Taxi Viedeň – Bratislava</div>
+      <div class="sig-phone">+421 907 926 375</div>
+      <div class="sig-web"><a href="https://www.taxi-vienna-bratislava.com" target="_blank">www.taxi-vienna-bratislava.com</a></div>
+      <div style="margin-top:14px;">
+        <div class="banner-preview">
+          <div class="b-sub">Letiskový transfer</div>
+          <div class="b-title">🚖 Taxi Vienna–Bratislava</div>
+          <div style="font-size:12px;color:#ccd9ff;margin-bottom:6px;">VIE ↔ BTS · Komfortný transfer</div>
+          <div class="b-cta">Rezervovať transfer →</div>
+        </div>
+        <div class="banner-label">↑ Ukážka bannera (dodáme v požadovanej veľkosti)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== CZECH ===== -->
+<div id="lang-cs" class="lang-content">
+<div class="email-client">
+  <div class="client-bar">
+    <div class="field"><span class="label">Od:</span> <span class="value">Tomáš Ambroz &lt;ambidsign@gmail.com&gt;</span></div>
+    <div class="field"><span class="label">Komu:</span> <span class="value">recepce@hotelpriletistu.cz</span></div>
+    <div class="field"><span class="label">BCC:</span> <span class="value">ambidsign@gmail.com</span></div>
+    <div class="subject-line">Nabídka spolupráce pro Váš hotel – Taxi Vídeň–Bratislava</div>
+  </div>
+  <div class="email-body">
+    <p class="intro">Dobrý den,</p>
+    <p>obracím se na Vás s přátelskou nabídkou spolupráce, která by mohla být přínosem pro nás oba.</p>
+    <p>Provozujeme letištní taxislužbu <strong>taxi-vienna-bratislava.com</strong> – zajišťujeme pohodlné a spolehlivé transfery mezi Vídní, Bratislavou a okolními letišti (VIE, BTS). Naší zákazníci jsou právě cestující, kteří hledají ubytování v oblasti letišť – tedy přesně Vaši potenciální hosté.</p>
+
+    <div class="options-box">
+      <div class="box-title">Co navrhujeme?</div>
+      <ul>
+        <li>Výměna partnerských odkazů – my Vás uvedeme v sekci doporučených hotelů, Vy nám odkaz v sekci „Doprava" nebo „Partneři"</li>
+        <li><strong>Umístění našeho reklamního banneru na Vašem webu</strong> – dodáme grafiku v požadované velikosti, bez nároku na poplatky</li>
+        <li>Kombinace obou možností</li>
+      </ul>
+    </div>
+
+    <p>Tato spolupráce je pro Vás bezplatná a pro Vaše hosty skutečně praktická – mohou si předem zajistit transfer z letiště přímo k Vám.</p>
+    <p class="closing">Pokud Vás některá z možností zaujme, stačí odpovědět na tento email – rádi se domluvíme na detailech.</p>
+    <p>Děkujeme za čas a těšíme se na případnou spolupráci!</p>
+
+    <div class="signature">
+      <div class="sig-name">Tomáš Ambroz</div>
+      <div class="sig-company">Taxi Vídeň – Bratislava</div>
+      <div class="sig-phone">+421 907 926 375</div>
+      <div class="sig-web"><a href="https://www.taxi-vienna-bratislava.com" target="_blank">www.taxi-vienna-bratislava.com</a></div>
+      <div style="margin-top:14px;">
+        <div class="banner-preview">
+          <div class="b-sub">Letištní transfer</div>
+          <div class="b-title">🚖 Taxi Vienna–Bratislava</div>
+          <div style="font-size:12px;color:#ccd9ff;margin-bottom:6px;">VIE ↔ BTS · Komfortní transfer</div>
+          <div class="b-cta">Rezervovat transfer →</div>
+        </div>
+        <div class="banner-label">↑ Ukázka banneru (dodáme v požadované velikosti)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== GERMAN ===== -->
+<div id="lang-de" class="lang-content">
+<div class="email-client">
+  <div class="client-bar">
+    <div class="field"><span class="label">Von:</span> <span class="value">Tomáš Ambroz &lt;ambidsign@gmail.com&gt;</span></div>
+    <div class="field"><span class="label">An:</span> <span class="value">info@hotelwienflughafen.at</span></div>
+    <div class="field"><span class="label">BCC:</span> <span class="value">ambidsign@gmail.com</span></div>
+    <div class="subject-line">Kooperationsangebot für Ihr Hotel – Taxi Wien–Bratislava</div>
+  </div>
+  <div class="email-body">
+    <p class="intro">Guten Tag,</p>
+    <p>ich melde mich bei Ihnen mit einem freundlichen Kooperationsangebot, das für beide Seiten von Vorteil sein könnte.</p>
+    <p>Wir betreiben den Flughafentransfer-Service <strong>taxi-vienna-bratislava.com</strong> – wir bieten bequeme und zuverlässige Transfers zwischen Wien, Bratislava und den umliegenden Flughäfen (VIE, BTS). Unsere Kunden sind genau die Reisenden, die in der Nähe der Flughäfen eine Unterkunft suchen – also potenzielle Gäste für Ihr Haus.</p>
+
+    <div class="options-box">
+      <div class="box-title">Unser Vorschlag:</div>
+      <ul>
+        <li>Austausch von Partnerlinks – wir nennen Sie in unserer Rubrik „Empfohlene Hotels", Sie verlinken uns unter „Anreise" oder „Partner"</li>
+        <li><strong>Platzierung unseres Werbebanners auf Ihrer Website</strong> – wir liefern die Grafik in der gewünschten Größe, kostenlos für Sie</li>
+        <li>Kombination beider Möglichkeiten</li>
+      </ul>
+    </div>
+
+    <p>Diese Zusammenarbeit ist für Sie kostenlos und für Ihre Gäste wirklich praktisch – sie können schon im Voraus einen Transfer vom Flughafen direkt zu Ihnen buchen.</p>
+    <p class="closing">Wenn Sie interessiert sind, antworten Sie einfach auf diese E-Mail – wir besprechen gerne die Details.</p>
+    <p>Vielen Dank für Ihre Zeit und wir freuen uns auf eine mögliche Zusammenarbeit!</p>
+
+    <div class="signature">
+      <div class="sig-name">Tomáš Ambroz</div>
+      <div class="sig-company">Taxi Wien – Bratislava</div>
+      <div class="sig-phone">+421 907 926 375</div>
+      <div class="sig-web"><a href="https://www.taxi-vienna-bratislava.com" target="_blank">www.taxi-vienna-bratislava.com</a></div>
+      <div style="margin-top:14px;">
+        <div class="banner-preview">
+          <div class="b-sub">Flughafentransfer</div>
+          <div class="b-title">🚖 Taxi Vienna–Bratislava</div>
+          <div style="font-size:12px;color:#ccd9ff;margin-bottom:6px;">VIE ↔ BTS · Komfortabler Transfer</div>
+          <div class="b-cta">Transfer buchen →</div>
+        </div>
+        <div class="banner-label">↑ Banner-Vorschau (wir liefern in gewünschter Größe)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== HUNGARIAN ===== -->
+<div id="lang-hu" class="lang-content">
+<div class="email-client">
+  <div class="client-bar">
+    <div class="field"><span class="label">Feladó:</span> <span class="value">Tomáš Ambroz &lt;ambidsign@gmail.com&gt;</span></div>
+    <div class="field"><span class="label">Címzett:</span> <span class="value">info@hotelbudapestairport.hu</span></div>
+    <div class="field"><span class="label">BCC:</span> <span class="value">ambidsign@gmail.com</span></div>
+    <div class="subject-line">Együttműködési ajánlat szállodájának – Taxi Bécs–Pozsony</div>
+  </div>
+  <div class="email-body">
+    <p class="intro">Tisztelt Hölgyem/Uram,</p>
+    <p>barátságos együttműködési javaslattal fordulok Önhöz, amely mindkét fél számára előnyös lehet.</p>
+    <p>Mi a <strong>taxi-vienna-bratislava.com</strong> repülőtéri transzfer szolgáltatást üzemeltetjük – kényelmes és megbízható transzfereket biztosítunk Bécs, Pozsony és a környező repülőterek (VIE, BTS) között. Ügyfeleink pontosan azok az utazók, akik a repülőterek közelében keresnek szállást – tehát az Ön potenciális vendégei.</p>
+
+    <div class="options-box">
+      <div class="box-title">Javaslatunk:</div>
+      <ul>
+        <li>Partnerlink-csere – mi feltüntetjük Önt az ajánlott szállodák között, Ön linkel minket a „Megközelítés" vagy „Partnerek" rovatban</li>
+        <li><strong>Reklámbannerünk elhelyezése az Ön weboldalán</strong> – a grafikát kívánt méretben szállítjuk, Önnek ingyenesen</li>
+        <li>A két lehetőség kombinációja</li>
+      </ul>
+    </div>
+
+    <p>Ez az együttműködés Önnek ingyenes, és vendégei számára igazán praktikus – így előre megszervezhetik a repülőtéri transzfert közvetlenül az Ön szállodájához.</p>
+    <p class="closing">Ha az ajánlat felkeltette érdeklődését, egyszerűen válaszoljon erre az e-mailre – szívesen egyeztetünk a részletekről.</p>
+    <p>Köszönjük az idejét, és várjuk esetleges együttműködésünket!</p>
+
+    <div class="signature">
+      <div class="sig-name">Tomáš Ambroz</div>
+      <div class="sig-company">Taxi Bécs – Pozsony</div>
+      <div class="sig-phone">+421 907 926 375</div>
+      <div class="sig-web"><a href="https://www.taxi-vienna-bratislava.com" target="_blank">www.taxi-vienna-bratislava.com</a></div>
+      <div style="margin-top:14px;">
+        <div class="banner-preview">
+          <div class="b-sub">Repülőtéri transzfer</div>
+          <div class="b-title">🚖 Taxi Vienna–Bratislava</div>
+          <div style="font-size:12px;color:#ccd9ff;margin-bottom:6px;">VIE ↔ BTS · Kényelmes transzfer</div>
+          <div class="b-cta">Transzfer foglalása →</div>
+        </div>
+        <div class="banner-label">↑ Banner előnézet (kívánt méretben szállítjuk)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== ENGLISH ===== -->
+<div id="lang-en" class="lang-content">
+<div class="email-client">
+  <div class="client-bar">
+    <div class="field"><span class="label">From:</span> <span class="value">Tomáš Ambroz &lt;ambidsign@gmail.com&gt;</span></div>
+    <div class="field"><span class="label">To:</span> <span class="value">info@airporthotel.com</span></div>
+    <div class="field"><span class="label">BCC:</span> <span class="value">ambidsign@gmail.com</span></div>
+    <div class="subject-line">Partnership Proposal for Your Hotel – Taxi Vienna–Bratislava</div>
+  </div>
+  <div class="email-body">
+    <p class="intro">Dear Sir or Madam,</p>
+    <p>I am reaching out with a friendly cooperation proposal that could be mutually beneficial.</p>
+    <p>We operate <strong>taxi-vienna-bratislava.com</strong> – a comfortable and reliable airport transfer service between Vienna, Bratislava, and surrounding airports (VIE, BTS). Our customers are exactly the travelers who are looking for accommodation near airports – your potential guests.</p>
+
+    <div class="options-box">
+      <div class="box-title">Our proposal:</div>
+      <ul>
+        <li>Partner link exchange – we list your hotel on our website under recommended accommodations, you link to us under "Getting Here" or "Partners"</li>
+        <li><strong>Placing our advertising banner on your website</strong> – we provide the artwork in any size you need, free of charge</li>
+        <li>A combination of both options</li>
+      </ul>
+    </div>
+
+    <p>This cooperation is completely free for you and genuinely practical for your guests – they can arrange their airport transfer directly to your hotel in advance.</p>
+    <p class="closing">If you are interested, simply reply to this email and we can discuss the details.</p>
+    <p>Thank you for your time, and we look forward to a possible partnership!</p>
+
+    <div class="signature">
+      <div class="sig-name">Tomáš Ambroz</div>
+      <div class="sig-company">Taxi Vienna – Bratislava</div>
+      <div class="sig-phone">+421 907 926 375</div>
+      <div class="sig-web"><a href="https://www.taxi-vienna-bratislava.com" target="_blank">www.taxi-vienna-bratislava.com</a></div>
+      <div style="margin-top:14px;">
+        <div class="banner-preview">
+          <div class="b-sub">Airport Transfer</div>
+          <div class="b-title">🚖 Taxi Vienna–Bratislava</div>
+          <div style="font-size:12px;color:#ccd9ff;margin-bottom:6px;">VIE ↔ BTS · Comfortable Transfer</div>
+          <div class="b-cta">Book your transfer →</div>
+        </div>
+        <div class="banner-label">↑ Banner preview (delivered in any size you need)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function switchLang(lang) {
+  document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('lang-' + lang).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
