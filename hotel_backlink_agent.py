@@ -60,7 +60,7 @@ OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
 SENT_LOG = "hotel_sent_emails.json"
-BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "taxi.svg")
+BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Taxi.svg")
 
 HEADERS = {
     "User-Agent": (
@@ -453,16 +453,14 @@ def build_html_body(plain_body: str) -> str:
         content = "".join(options_lines)
         return (
             f'<div style="background:#e8f0fe;border-left:4px solid #1a56db;'
-            f'border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;">'
+            f'border-radius:0 8px 8px 0;padding:16px 20px;margin:24px 0;">'
             f'{content}</div>'
         )
 
     for line in lines:
         if not line.strip():
-            if in_options:
-                pass  # prázdne riadky v sekcii ignorujeme
-            else:
-                out += '<div style="margin:8px 0;"></div>'
+            if not in_options:
+                out += '<div style="margin:14px 0;"></div>'
             continue
 
         if line.startswith("**") and line.endswith("**"):
@@ -507,7 +505,7 @@ def build_html_body(plain_body: str) -> str:
             r'<a href="https://www.taxi-vienna-bratislava.com" target="_blank">\1</a>',
             line,
         )
-        out += f"<div>{line}</div>"
+        out += f'<div style="margin:2px 0;">{line}</div>'
 
     if in_options:
         out += flush_options()
