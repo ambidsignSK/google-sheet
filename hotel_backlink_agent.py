@@ -60,7 +60,7 @@ OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
 
 SENT_LOG = "hotel_sent_emails.json"
-BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Taxi.png")
+BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "taxi.png")
 
 HEADERS = {
     "User-Agent": (
