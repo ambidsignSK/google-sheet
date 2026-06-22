@@ -45,7 +45,39 @@ Pre testovanie bez odosielania emailov:
 python hotel_backlink_agent.py --dry-run
 ```
 
-Agent hľadá hotely pri letiskách VIE (Viedeň), BTS (Bratislava), BUD (Budapešť) a BRQ (Brno), extrahuje emaily z ich webov a odosiela ponuku spolupráce (spätný odkaz) v jazyku danej krajiny (SK/CZ/DE/HU/EN).
+Agent hľadá hotely pri letiskách VIE (Viedeň), BTS (Bratislava), BUD (Budapešť), PRG (Praha) a BRQ (Brno), extrahuje emaily z ich webov a odosiela ponuku spolupráce (spätný odkaz) v jazyku danej krajiny (SK/CZ/DE/HU/EN).
+
+## Testovanie emailov (hotel agent)
+
+Keď používateľ povie "pošli test", "otestuj emaily" alebo "pošli preview":
+
+```bash
+python send_previews.py
+```
+
+Odošle 5 testovacích emailov (SK/CZ/DE/HU/EN) na ambidsign@gmail.com.
+
+Pre konkrétny jazyk:
+
+```bash
+python preview_email.py sk
+python preview_email.py cs
+python preview_email.py de
+python preview_email.py hu
+python preview_email.py en
+```
+
+## Zobraziť emailové kontakty roztriedené podľa krajiny
+
+```bash
+python show_contacts.py
+```
+
+## Overiť Gmail nastavenie
+
+```bash
+python test_email.py
+```
 
 ## Dôležité informácie
 
