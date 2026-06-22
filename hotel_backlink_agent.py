@@ -152,7 +152,7 @@ Dobrý deň,
 
 obraciam sa na Vás s priateľskou ponukou spolupráce, ktorá by mohla byť prínosom pre nás oboch.
 
-Prevádzkujeme letiskovú taxislužbu **taxi-vienna-bratislava.com** – zabezpečujeme pohodlné a spoľahlivé transfery medzi Viedňou, Bratislavou a okolitými letiskami (VIE, BTS). Naší zákazníci sú práve cestujúci, ktorí vyhľadávajú ubytovanie v oblasti letísk – teda presne Vaši potenciálni hostia.
+Prevádzkujeme letiskovú taxislužbu **taxi-vienna-bratislava.com** – zabezpečujeme pohodlné a spoľahlivé transfery medzi všetkými veľkými letiskami v regióne: Viedeň (VIE), Bratislava (BTS), Budapešť (BUD), Praha (PRG) a Brno (BRQ). Naši zákazníci sú práve cestujúci, ktorí vyhľadávajú ubytovanie v oblasti letísk – teda presne Vaši potenciálni hostia.
 
 **Čo navrhujeme?**
 Radi by sme nadviazali spoluprácu v niektorej z týchto foriem – podľa toho, čo Vám najviac vyhovuje:
@@ -181,7 +181,7 @@ Dobrý den,
 
 obracím se na Vás s přátelskou nabídkou spolupráce, která by mohla být přínosem pro nás oba.
 
-Provozujeme letištní taxislužbu **taxi-vienna-bratislava.com** – zajišťujeme pohodlné a spolehlivé transfery mezi Vídní, Bratislavou a okolními letišti (VIE, BTS). Naší zákazníci jsou právě cestující, kteří hledají ubytování v oblasti letišť – tedy přesně Vaši potenciální hosté.
+Provozujeme letištní taxislužbu **taxi-vienna-bratislava.com** – zajišťujeme pohodlné a spolehlivé transfery mezi všemi velkými letišti v regionu: Vídeň (VIE), Bratislava (BTS), Budapešť (BUD), Praha (PRG) a Brno (BRQ). Naší zákazníci jsou právě cestující, kteří hledají ubytování v oblasti letišť – tedy přesně Vaši potenciální hosté.
 
 **Co navrhujeme?**
 Rádi bychom navázali spolupráci v některé z těchto forem – podle toho, co Vám nejvíce vyhovuje:
@@ -210,7 +210,7 @@ Guten Tag,
 
 ich melde mich bei Ihnen mit einem freundlichen Kooperationsangebot, das für beide Seiten von Vorteil sein könnte.
 
-Wir betreiben den Flughafentransfer-Service **taxi-vienna-bratislava.com** – wir bieten bequeme und zuverlässige Transfers zwischen Wien, Bratislava und den umliegenden Flughäfen (VIE, BTS). Unsere Kunden sind genau die Reisenden, die in der Nähe der Flughäfen eine Unterkunft suchen – also potenzielle Gäste für Ihr Haus.
+Wir betreiben den Flughafentransfer-Service **taxi-vienna-bratislava.com** – wir bieten bequeme und zuverlässige Transfers zwischen allen großen Flughäfen der Region: Wien (VIE), Bratislava (BTS), Budapest (BUD), Prag (PRG) und Brünn (BRQ). Unsere Kunden sind genau die Reisenden, die in der Nähe der Flughäfen eine Unterkunft suchen – also potenzielle Gäste für Ihr Haus.
 
 **Unser Vorschlag:**
 Wir würden uns freuen, eine Zusammenarbeit in einer der folgenden Formen zu starten – ganz wie es für Sie am besten passt:
@@ -239,7 +239,7 @@ Tisztelt Hölgyem/Uram,
 
 barátságos együttműködési javaslattal fordulok Önhöz, amely mindkét fél számára előnyös lehet.
 
-Mi a **taxi-vienna-bratislava.com** repülőtéri transzfer szolgáltatást üzemeltetjük – kényelmes és megbízható transzfereket biztosítunk Bécs, Pozsony és a környező repülőterek (VIE, BTS) között. Ügyfeleink pontosan azok az utazók, akik a repülőterek közelében keresnek szállást – tehát az Ön potenciális vendégei.
+Mi a **taxi-vienna-bratislava.com** repülőtéri transzfer szolgáltatást üzemeltetjük – kényelmes és megbízható transzfereket biztosítunk a régió összes nagy repülőtere között: Bécs (VIE), Pozsony (BTS), Budapest (BUD), Prága (PRG) és Brno (BRQ). Ügyfeleink pontosan azok az utazók, akik a repülőterek közelében keresnek szállást – tehát az Ön potenciális vendégei.
 
 **Javaslatunk:**
 Szívesen indítanánk együttműködést az alábbi formák egyikében – attól függően, ami Önnek a legjobban megfelel:
@@ -268,7 +268,7 @@ Dear Sir or Madam,
 
 I am reaching out with a friendly cooperation proposal that could be mutually beneficial.
 
-We operate **taxi-vienna-bratislava.com** – a comfortable and reliable airport transfer service between Vienna, Bratislava, and surrounding airports (VIE, BTS). Our customers are exactly the travelers who are looking for accommodation near airports – your potential guests.
+We operate **taxi-vienna-bratislava.com** – a comfortable and reliable airport transfer service covering all major airports in the region: Vienna (VIE), Bratislava (BTS), Budapest (BUD), Prague (PRG) and Brno (BRQ). Our customers are exactly the travelers who are looking for accommodation near airports – your potential guests.
 
 **Our proposal:**
 We would love to start a cooperation in one of the following forms – whichever works best for you:
