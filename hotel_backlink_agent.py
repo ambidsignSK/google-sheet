@@ -585,6 +585,66 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Textový report
+# ---------------------------------------------------------------------------
+
+def _write_text_report(results: dict, txt_file: str):
+    COUNTRY_NAMES = {
+        "VIE": "Rakúsko (Viedeň – VIE)",
+        "BTS": "Slovensko (Bratislava – BTS)",
+        "BUD": "Maďarsko (Budapešť – BUD)",
+        "PRG": "Česká republika (Praha – PRG)",
+        "BRQ": "Česká republika (Brno – BRQ)",
+    }
+    STATUS_LABEL = {
+        "sent": "odoslaný",
+        "dry_run": "test (dry-run)",
+        "error": "chyba",
+        "already_sent": "preskočený (už odoslaný)",
+        "no_email": "bez emailu",
+    }
+
+    by_region: dict = {}
+    for h in results.get("hotels", []):
+        region = h.get("region", "?")
+        by_region.setdefault(region, []).append(h)
+
+    lines = []
+    lines.append("=" * 65)
+    lines.append("HOTEL BACKLINK AGENT – TEXTOVÝ SÚHRN")
+    lines.append(f"Dátum spustenia: {results.get('started_at', datetime.now().isoformat())}")
+    lines.append("=" * 65)
+    lines.append(f"Celkom URL nájdených:  {results.get('total_urls', 0)}")
+    lines.append(f"Emailov nájdených:     {results.get('emails_found', 0)}")
+    lines.append(f"Emailov odoslaných:    {results.get('emails_sent', 0)}")
+    lines.append(f"Preskočených:          {results.get('skipped', 0)}")
+    lines.append("")
+
+    for region, hotels in sorted(by_region.items()):
+        country = COUNTRY_NAMES.get(region, region)
+        sent_hotels = [h for h in hotels if h.get("status") in ("sent", "dry_run")]
+        lines.append("-" * 65)
+        lines.append(f"Krajina / letisko: {country}")
+        lines.append(f"Oslovených hotelov: {len(sent_hotels)}")
+        lines.append("")
+        for h in hotels:
+            status = STATUS_LABEL.get(h.get("status", ""), h.get("status", ""))
+            email = h.get("email", "-")
+            url = h.get("url", "-")
+            sent_at = h.get("sent_at", "-")
+            lines.append(f"  [{status}]")
+            lines.append(f"    Hotel:    {url}")
+            lines.append(f"    Email:    {email}")
+            lines.append(f"    Čas:      {sent_at}")
+            lines.append("")
+
+    lines.append("=" * 65)
+
+    with open(txt_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
 # Hlavná logika agenta
 # ---------------------------------------------------------------------------
 
@@ -605,6 +665,7 @@ def run_hotel_agent(only_lang: str = None):
 
     sent = load_sent()
     results = {
+        "started_at": datetime.now().isoformat(),
         "total_urls": 0,
         "emails_found": 0,
         "emails_sent": 0,
@@ -670,26 +731,31 @@ def run_hotel_agent(only_lang: str = None):
 
                 if DRY_RUN:
                     log.warning(f"      [DRY RUN] Email by bol odoslaný na: {email} [{lang.upper()}]")
-                    results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run"})
+                    results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run", "sent_at": datetime.now().isoformat()})
                 elif GMAIL_APP_PASSWORD:
                     success = send_email(email, subject, body)
                     if success:
                         sent.add(email)
                         save_sent(sent)
                         results["emails_sent"] += 1
-                        results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "sent"})
+                        results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "sent", "sent_at": datetime.now().isoformat()})
                     else:
-                        results["hotels"].append({"url": url, "email": email, "region": region["airport"], "status": "error"})
+                        results["hotels"].append({"url": url, "email": email, "region": region["airport"], "status": "error", "sent_at": datetime.now().isoformat()})
                 else:
                     log.warning(f"      [NO PASSWORD] Email by bol odoslaný na: {email} [{lang.upper()}]")
-                    results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run"})
+                    results["hotels"].append({"url": url, "email": email, "lang": lang, "region": region["airport"], "status": "dry_run", "sent_at": datetime.now().isoformat()})
 
                 time.sleep(EMAIL_DELAY)
 
-    # Uloženie reportu
-    report_file = f"hotel_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    # Uloženie JSON reportu
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    report_file = f"hotel_report_{ts}.json"
     with open(report_file, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
+
+    # Textový výstup
+    txt_file = f"hotel_report_{ts}.txt"
+    _write_text_report(results, txt_file)
 
     log.info("\n" + "=" * 65)
     log.info("SÚHRN:")
@@ -698,6 +764,7 @@ def run_hotel_agent(only_lang: str = None):
     log.info(f"  Emailov odoslaných:      {results['emails_sent']}")
     log.info(f"  Preskočených:            {results['skipped']}")
     log.info(f"  Report uložený:          {report_file}")
+    log.info(f"  Textový súhrn:           {txt_file}")
     log.info("=" * 65)
 
     _send_summary(results)
