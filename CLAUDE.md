@@ -67,6 +67,31 @@ python preview_email.py hu
 python preview_email.py en
 ```
 
+Keď používateľ povie "pošli test SK" alebo "otestuj slovenský email":
+```bash
+python preview_email.py sk
+```
+
+Keď používateľ povie "pošli test CZ" alebo "otestuj český email":
+```bash
+python preview_email.py cs
+```
+
+Keď používateľ povie "pošli test DE" alebo "otestuj nemecký email":
+```bash
+python preview_email.py de
+```
+
+Keď používateľ povie "pošli test HU" alebo "otestuj maďarský email":
+```bash
+python preview_email.py hu
+```
+
+Keď používateľ povie "pošli test EN" alebo "otestuj anglický email":
+```bash
+python preview_email.py en
+```
+
 ## Zobraziť emailové kontakty roztriedené podľa krajiny
 
 ```bash
