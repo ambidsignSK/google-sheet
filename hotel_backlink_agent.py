@@ -588,9 +588,18 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
 # Hlavná logika agenta
 # ---------------------------------------------------------------------------
 
-def run_hotel_agent():
+def run_hotel_agent(only_lang: str = None):
+    lang_filter = only_lang.lower() if only_lang else None
+    # Mapovanie jazyka na country kódy regiónov
+    lang_to_countries = {
+        "sk": ["SK"], "cs": ["CZ"], "cz": ["CZ"],
+        "de": ["AT"], "hu": ["HU"], "en": [],
+    }
+
     log.info("=" * 65)
     log.info("Hotel Backlink Agent – START")
+    if lang_filter:
+        log.info(f"Jazyk: {lang_filter.upper()} (len vybrané regióny)")
     log.info(f"Hľadám hotely pri letiskách pre: {OUR_WEBSITE}")
     log.info("=" * 65)
 
@@ -605,7 +614,13 @@ def run_hotel_agent():
 
     processed_urls = set()
 
-    for region in AIRPORT_REGIONS:
+    regions = AIRPORT_REGIONS
+    if lang_filter and lang_filter in lang_to_countries:
+        allowed = lang_to_countries[lang_filter]
+        if allowed:
+            regions = [r for r in AIRPORT_REGIONS if r["country"] in allowed]
+
+    for region in regions:
         log.info(f"\n🛫 Región: {region['airport']} ({region['country']})")
 
         hotel_urls = []
@@ -726,7 +741,18 @@ Legenda: ✅ odoslané | ❌ email nenájdený | ⏭ už odoslané | ⚠️ chyb
 
 if __name__ == "__main__":
     import sys
-    if "--dry-run" in sys.argv:
+    args = sys.argv[1:]
+
+    if "--dry-run" in args:
         DRY_RUN = True
+        args.remove("--dry-run")
         log.info("🔍 DRY RUN mód – emaily sa NEODOŠLÚ")
-    run_hotel_agent()
+
+    # Jazyk ako argument: python hotel_backlink_agent.py sk
+    lang_arg = args[0].lower() if args else None
+    valid_langs = {"sk", "cs", "cz", "de", "hu", "en"}
+    if lang_arg and lang_arg not in valid_langs:
+        log.error(f"Neznámy jazyk: {lang_arg}. Možnosti: {', '.join(sorted(valid_langs))}")
+        sys.exit(1)
+
+    run_hotel_agent(only_lang=lang_arg)

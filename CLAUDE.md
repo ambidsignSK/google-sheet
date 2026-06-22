@@ -33,16 +33,27 @@ python monitor.py
 
 ## Spustiť hotel backlink agenta
 
-Keď používateľ povie "hľadaj hotely", "oslovi hotely" alebo "spusti hotel agenta":
+Keď používateľ povie "hľadaj hotely", "oslovi hotely" alebo "spusti hotel agenta" (všetky jazyky):
 
 ```bash
 python hotel_backlink_agent.py
+```
+
+Pre konkrétny jazyk (iba dané regióny):
+
+```bash
+python hotel_backlink_agent.py sk
+python hotel_backlink_agent.py cs
+python hotel_backlink_agent.py de
+python hotel_backlink_agent.py hu
+python hotel_backlink_agent.py en
 ```
 
 Pre testovanie bez odosielania emailov:
 
 ```bash
 python hotel_backlink_agent.py --dry-run
+python hotel_backlink_agent.py sk --dry-run
 ```
 
 Agent hľadá hotely pri letiskách VIE (Viedeň), BTS (Bratislava), BUD (Budapešť), PRG (Praha) a BRQ (Brno), extrahuje emaily z ich webov a odosiela ponuku spolupráce (spätný odkaz) v jazyku danej krajiny (SK/CZ/DE/HU/EN).
