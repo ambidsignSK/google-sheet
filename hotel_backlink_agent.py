@@ -49,15 +49,17 @@ EMAIL_DELAY = int(os.getenv("EMAIL_DELAY", "15"))
 
 OUR_WEBSITE = "taxi-vienna-bratislava.com"
 OUR_NAME = "Tomáš Ambroz"
-OUR_TITLES = {
-    "sk": "Marketingový manažér",
-    "cs": "Marketingový manažér",
-    "de": "Marketing Manager",
-    "hu": "Marketing menedzser",
-    "en": "Marketing Manager",
-}
+OUR_BRAND = "Ambi Design"
 OUR_COMPANY = "NENBRA s.r.o."
 OUR_PHONE = "+421 907 926 375"
+
+COLLAB = {
+    "sk": "v spolupráci s",
+    "cs": "ve spolupráci s",
+    "de": "in Zusammenarbeit mit",
+    "hu": "együttműködésben",
+    "en": "in partnership with",
+}
 
 SENT_LOG = "hotel_sent_emails.json"
 BANNER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Taxi.png")
@@ -170,9 +172,11 @@ Ak Vás niektorá z možností zaujíma, stačí odpovedať na tento email – r
 S priateľským pozdravom
 
 {name}
-{title} | {company}
-Prevádzkovateľ taxi-vienna-bratislava.com
+{brand}
 {phone}
+
+{collab} | {company}
+Prevádzkovateľ taxi-vienna-bratislava.com
 www.taxi-vienna-bratislava.com
 """,
 
@@ -199,9 +203,11 @@ Děkujeme za čas a těšíme se na případnou spolupráci!
 S přátelským pozdravem
 
 {name}
-{title} | {company}
-Provozovatel taxi-vienna-bratislava.com
+{brand}
 {phone}
+
+{collab} | {company}
+Provozovatel taxi-vienna-bratislava.com
 www.taxi-vienna-bratislava.com
 """,
 
@@ -228,9 +234,11 @@ Vielen Dank für Ihre Zeit und wir freuen uns auf eine mögliche Zusammenarbeit!
 Mit freundlichen Grüßen
 
 {name}
-{title} | {company}
-Betreiber von taxi-vienna-bratislava.com
+{brand}
 {phone}
+
+{collab} | {company}
+Betreiber von taxi-vienna-bratislava.com
 www.taxi-vienna-bratislava.com
 """,
 
@@ -257,9 +265,11 @@ Köszönjük az idejét, és várjuk esetleges együttműködésünket!
 Barátsággal,
 
 {name}
-{title} | {company}
-A taxi-vienna-bratislava.com üzemeltetője
+{brand}
 {phone}
+
+{collab} | {company}
+A taxi-vienna-bratislava.com üzemeltetője
 www.taxi-vienna-bratislava.com
 """,
 
@@ -286,9 +296,11 @@ Thank you for your time, and we look forward to a possible partnership!
 Kind regards,
 
 {name}
-{title} | {company}
-Operator of taxi-vienna-bratislava.com
+{brand}
 {phone}
+
+{collab} | {company}
+Operator of taxi-vienna-bratislava.com
 www.taxi-vienna-bratislava.com
 """,
 }
@@ -625,8 +637,10 @@ def run_hotel_agent():
             lang = detect_hotel_language(url, region["country"])
             subject = SUBJECTS.get(lang, SUBJECTS["en"])
             body_template = BODIES.get(lang, BODIES["en"])
-            title = OUR_TITLES.get(lang, OUR_TITLES["en"])
-            body = body_template.format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
+            body = body_template.format(
+                name=OUR_NAME, brand=OUR_BRAND, company=OUR_COMPANY,
+                phone=OUR_PHONE, collab=COLLAB.get(lang, COLLAB["en"]),
+            )
 
             for email in emails[:1]:  # prvý nájdený email
                 results["emails_found"] += 1

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from hotel_backlink_agent import (
-    SUBJECTS, BODIES, OUR_NAME, OUR_TITLES, OUR_COMPANY, OUR_PHONE,
+    SUBJECTS, BODIES, OUR_NAME, OUR_BRAND, OUR_COMPANY, OUR_PHONE, COLLAB,
     GMAIL_ADDRESS, GMAIL_APP_PASSWORD, build_html_body,
 )
 
@@ -20,8 +20,10 @@ if lang not in SUBJECTS:
     sys.exit(1)
 
 subject = f"[PREVIEW {lang.upper()}] {SUBJECTS[lang]}"
-title = OUR_TITLES.get(lang, OUR_TITLES["en"])
-body = BODIES[lang].format(name=OUR_NAME, title=title, company=OUR_COMPANY, phone=OUR_PHONE)
+body = BODIES[lang].format(
+    name=OUR_NAME, brand=OUR_BRAND, company=OUR_COMPANY,
+    phone=OUR_PHONE, collab=COLLAB.get(lang, COLLAB["en"]),
+)
 
 print("=" * 60)
 print(f"PREDMET: {SUBJECTS[lang]}")
