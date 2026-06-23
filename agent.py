@@ -10,6 +10,7 @@ import smtplib
 import logging
 import json
 import base64
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -35,7 +36,7 @@ log = logging.getLogger(__name__)
 GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS", "ambidsign@gmail.com")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 DAYS_BACK = int(os.getenv("DAYS_BACK", "7"))
-EMAIL_DELAY = int(os.getenv("EMAIL_DELAY", "10"))
+EMAIL_DELAY = int(os.getenv("EMAIL_DELAY", "3"))
 
 SENT_LOG = "sent_emails.json"
 
@@ -311,7 +312,7 @@ def fetch_from_firmy_sk(pages: int = 3) -> list[dict]:
                         "email": email,
                         "source": "firmy.sk",
                     })
-            time.sleep(1)
+            time.sleep(0.3)
         except Exception as e:
             log.debug(f"firmy.sk strana {page}: {e}")
     log.info(f"firmy.sk: najdených {len(companies)} firiem")
@@ -726,15 +727,24 @@ def run_agent():
 
     sent = load_sent()
 
-    # 1. Zbieranie firiem - registre + katalogy
+    # 1. Zbieranie firiem - registre + katalogy (paralelne)
+    fetchers = [
+        lambda: fetch_new_companies_sk(DAYS_BACK),
+        lambda: fetch_new_companies_cz(DAYS_BACK),
+        fetch_from_firmy_sk,
+        fetch_from_najfirmy_sk,
+        fetch_from_zlatestranky_sk,
+        fetch_from_firmy_cz,
+        fetch_from_zlatestranky_cz,
+    ]
     companies = []
-    companies.extend(fetch_new_companies_sk(DAYS_BACK))
-    companies.extend(fetch_new_companies_cz(DAYS_BACK))
-    companies.extend(fetch_from_firmy_sk())
-    companies.extend(fetch_from_najfirmy_sk())
-    companies.extend(fetch_from_zlatestranky_sk())
-    companies.extend(fetch_from_firmy_cz())
-    companies.extend(fetch_from_zlatestranky_cz())
+    with ThreadPoolExecutor(max_workers=7) as ex:
+        futures = {ex.submit(fn): fn for fn in fetchers}
+        for future in as_completed(futures):
+            try:
+                companies.extend(future.result())
+            except Exception as e:
+                log.error(f"Chyba pri ziskavani firiem: {e}")
 
     # Deduplikacia podla nazvu firmy
     seen_names = set()
@@ -757,22 +767,23 @@ def run_agent():
         "companies": [],
     }
 
-    for i, company in enumerate(companies, 1):
-        log.info(f"[{i}/{len(companies)}] Spracovavam: {company['name']} ({company['country']})")
-
-        # 2. Ziskat email z ORSR detail
+    def enrich_company(company: dict) -> dict:
         if company.get("detail_url") and company["country"] == "SK" and company.get("source") != "firmy.sk":
             detail = get_orsr_detail(company["detail_url"])
             company.update(detail)
-
-        # 2b. Email z katalogoveho detailu (firmy.sk, najfirmy.sk atd.)
         if not company.get("email") and company.get("detail_url") and company.get("source"):
             email = get_email_from_catalog_detail(company["detail_url"], company["country"])
             if email:
                 company["email"] = email
-
-        # 3. Obohatit cez Google ak este nemas email
         company = enrich_with_google(company)
+        return company
+
+    log.info(f"Obohacujem {len(companies)} firiem (paralelne)...")
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        companies = list(ex.map(enrich_company, companies))
+
+    for i, company in enumerate(companies, 1):
+        log.info(f"[{i}/{len(companies)}] {company['name']} ({company['country']})")
 
         email = company.get("email", "")
 
