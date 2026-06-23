@@ -20,6 +20,7 @@ from urllib.parse import urlparse, urljoin
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from email_finder import find_email
 
 load_dotenv()
 
@@ -925,7 +926,10 @@ def run_agent():
             email = get_email_from_catalog_detail(company["detail_url"], company["country"])
             if email:
                 company["email"] = email
-        company = enrich_with_google(company)
+        if not company.get("email"):
+            email = find_email(company["name"], company["country"], company.get("web"))
+            if email:
+                company["email"] = email
         return company
 
     log.info(f"Obohacujem {len(companies)} firiem (paralelne)...")
