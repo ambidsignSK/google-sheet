@@ -510,7 +510,151 @@ def get_email_from_catalog_detail(detail_url: str, country: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Zdroj 5: Google - dalsi nacitanie web stranok firiem
+# Zdroj 5: Socialne siete - Facebook, Instagram, TikTok (cez Google)
+# ---------------------------------------------------------------------------
+
+def _google_search_urls(query: str, num: int = 10) -> list[str]:
+    """Vrati zoznam URL z Google vyhladavania."""
+    search_url = f"https://www.google.com/search?q={requests.utils.quote(query)}&num={num}"
+    try:
+        r = requests.get(search_url, headers=HEADERS, timeout=10)
+        soup = BeautifulSoup(r.text, "lxml")
+        urls = []
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            if href.startswith("/url?q="):
+                actual = href.split("/url?q=")[1].split("&")[0]
+                if actual.startswith("http"):
+                    urls.append(actual)
+        return urls
+    except Exception as e:
+        log.debug(f"Google search chyba: {e}")
+    return []
+
+
+def _extract_email_from_social_page(url: str) -> str:
+    """Pokusi sa najst email na verejnom profile socialnej siete."""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        emails = extract_emails_from_text(r.text)
+        for e in emails:
+            if not any(skip in e for skip in ["facebook", "instagram", "tiktok", "example", "sentry"]):
+                return e
+    except Exception:
+        pass
+    return ""
+
+
+def fetch_from_facebook(country: str = "SK", pages: int = 3) -> list[dict]:
+    """Hlada nove firemne Facebook stranky SK/CZ firiem cez Google."""
+    companies = []
+    keyword = "Slovensko nová firma" if country == "SK" else "Česká republika nová firma"
+    query = f'site:facebook.com/pages {keyword}'
+
+    urls = _google_search_urls(query, num=pages * 5)
+    for url in urls:
+        if "facebook.com" not in url or "/pages/" not in url:
+            continue
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            soup = BeautifulSoup(r.text, "lxml")
+            name = soup.find("title")
+            name = name.get_text(strip=True).replace(" | Facebook", "").replace(" - Facebook", "") if name else ""
+            if not name:
+                continue
+            email = _extract_email_from_social_page(url)
+            companies.append({
+                "name": name,
+                "ico": "",
+                "city": "",
+                "country": country,
+                "detail_url": url,
+                "email": email,
+                "source": "facebook",
+            })
+            time.sleep(0.5)
+        except Exception as e:
+            log.debug(f"Facebook strana {url}: {e}")
+
+    log.info(f"Facebook ({country}): najdených {len(companies)} firiem")
+    return companies
+
+
+def fetch_from_instagram(country: str = "SK", pages: int = 3) -> list[dict]:
+    """Hlada firemne Instagram profily SK/CZ firiem cez Google."""
+    companies = []
+    keyword = "Slovensko firma" if country == "SK" else "Česko firma"
+    query = f'site:instagram.com {keyword} kontakt email'
+
+    urls = _google_search_urls(query, num=pages * 5)
+    for url in urls:
+        if "instagram.com" not in url:
+            continue
+        parts = [p for p in url.rstrip("/").split("/") if p and "instagram.com" not in p and "?" not in p]
+        if not parts:
+            continue
+        username = parts[-1]
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            soup = BeautifulSoup(r.text, "lxml")
+            email = _extract_email_from_social_page(url)
+            # Meno z title
+            title = soup.find("title")
+            name = title.get_text(strip=True).split("•")[0].strip().split("(")[0].strip() if title else username
+            if not name:
+                name = username
+            companies.append({
+                "name": name,
+                "ico": "",
+                "city": "",
+                "country": country,
+                "detail_url": url,
+                "email": email,
+                "source": "instagram",
+            })
+            time.sleep(0.5)
+        except Exception as e:
+            log.debug(f"Instagram {url}: {e}")
+
+    log.info(f"Instagram ({country}): najdených {len(companies)} firiem")
+    return companies
+
+
+def fetch_from_tiktok(country: str = "SK", pages: int = 3) -> list[dict]:
+    """Hlada firemne TikTok profily SK/CZ firiem cez Google."""
+    companies = []
+    keyword = "Slovensko firma" if country == "SK" else "Česko firma"
+    query = f'site:tiktok.com {keyword} email kontakt'
+
+    urls = _google_search_urls(query, num=pages * 5)
+    for url in urls:
+        if "tiktok.com" not in url or "/@" not in url:
+            continue
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            soup = BeautifulSoup(r.text, "lxml")
+            email = _extract_email_from_social_page(url)
+            title = soup.find("title")
+            name = title.get_text(strip=True).split("|")[0].strip() if title else url
+            companies.append({
+                "name": name,
+                "ico": "",
+                "city": "",
+                "country": country,
+                "detail_url": url,
+                "email": email,
+                "source": "tiktok",
+            })
+            time.sleep(0.5)
+        except Exception as e:
+            log.debug(f"TikTok {url}: {e}")
+
+    log.info(f"TikTok ({country}): najdených {len(companies)} firiem")
+    return companies
+
+
+# ---------------------------------------------------------------------------
+# Zdroj 6: Google - dalsi nacitanie web stranok firiem
 # ---------------------------------------------------------------------------
 
 def enrich_with_google(company: dict) -> dict:
@@ -736,9 +880,15 @@ def run_agent():
         fetch_from_zlatestranky_sk,
         fetch_from_firmy_cz,
         fetch_from_zlatestranky_cz,
+        lambda: fetch_from_facebook("SK"),
+        lambda: fetch_from_facebook("CZ"),
+        lambda: fetch_from_instagram("SK"),
+        lambda: fetch_from_instagram("CZ"),
+        lambda: fetch_from_tiktok("SK"),
+        lambda: fetch_from_tiktok("CZ"),
     ]
     companies = []
-    with ThreadPoolExecutor(max_workers=7) as ex:
+    with ThreadPoolExecutor(max_workers=13) as ex:
         futures = {ex.submit(fn): fn for fn in fetchers}
         for future in as_completed(futures):
             try:
