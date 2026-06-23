@@ -31,6 +31,9 @@ SKIP_EMAILS = {
     "sentry", "w3.org", "schema.org", "googleapis", "cloudflare",
     "facebook.com", "instagram.com", "tiktok.com", "linkedin.com",
     "google.com", "apple.com", "microsoft.com",
+    "spolocnost.sk", "firma.sk", "firma.cz", "domena.sk", "domena.cz",
+    "vasafirma.sk", "vasafirma.cz", "email.sk", "email.cz",
+    "priklad.sk", "priklad.cz", "yourcompany", "yourdomain",
 }
 
 
